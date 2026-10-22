@@ -246,6 +246,11 @@
 </head>
 <body>
 
+  <!-- 🎵 BACKGROUND MUSIC AUDIO ELEMENT -->
+  <audio id="bgMusic" loop>
+    <source src="https://lh3.googleusercontent.com/d/1CZfTsnk_VJar_V6K0_82KZC1geWdBy9V" type="audio/mpeg">
+  </audio>
+
   <!-- 🌟 BACKGROUND SLIDESHOW LAYERS 🌟 -->
   <div id="slide1" class="bg-slide active"></div>
   <div id="slide2" class="bg-slide"></div>
@@ -261,15 +266,20 @@
 
   <div class="hud-text">Digital Concierge Active</div>
 
+  <!-- Music Toggle Button -->
+  <div>
+    <button onclick="toggleMusic()" style="margin: 10px auto; padding: 6px 14px; font-size: 9px; font-family: 'Segoe UI', sans-serif; background: rgba(212,175,55,0.15); border: 1px solid var(--gold-primary); color: var(--gold-light); border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">🎵 Toggle Music</button>
+  </div>
+
   <div id="result"></div>
 
   <script>
     // 📸 SLIDESHOW CONFIGURATION - 5 Photos
     var wallpaperList = [
-      "https://drive.google.com/file/d/10Fg6IY8TQnL3gxxE7bZ11cmfd6QEBLPa/view?usp=sharing",
-      "https://drive.google.com/file/d/1gcrO3Zlthjwa-DMVfUHfJsLJVQVJr2P5/view?usp=sharing",
-      "https://drive.google.com/file/d/1fbTblXhgHX8O5Cg0GUPQqPkA45JPZ6Gq/view?usp=sharing",
-      "https://drive.google.com/file/d/10NUMNL0BmOQD_zNCM29O7DGGNb6cIQob/view?usp=sharing"
+      "https://lh3.googleusercontent.com/d/10Fg6IY8TQnL3gxxE7bZ11cmfd6QEBLPa",
+      "https://lh3.googleusercontent.com/d/1gcrO3Zlthjwa-DMVfUHfJsLJVQVJr2P5",
+      "https://lh3.googleusercontent.com/d/1fbTblXhgHX8O5Cg0GUPQqPkA45JPZ6Gq",
+      "https://lh3.googleusercontent.com/d/10NUMNL0BmOQD_zNCM29O7DGGNb6cIQob"
     ];
     var currentBgIndex = 0;
     var activeSlide = 1;
@@ -326,19 +336,7 @@
           window.speechSynthesis.cancel();
         }
 
-        // 1. Remove text inside parentheses (e.g. "(HR Dept)")
-        var cleanName = name.split('(')[0].trim();
-
-        // 2. Remove common titles if present
-        cleanName = cleanName.replace(/^(Mr\.|Mrs\.|Ms\.|Dr\.|Dato\.|Datin\.|En\.|Puan|Cik)\s+/i, '');
-
-        // 3. Shorten long names to first 2 words for smooth greeting
-        var nameWords = cleanName.split(/\s+/);
-        if (nameWords.length > 2) {
-          cleanName = nameWords[0] + " " + nameWords[1];
-        }
-
-        var customSpeechText = "Welcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the Annual Dinner.";
+        var customSpeechText = "Welcome. Your table assignment is " + table + ". Please enjoy the Annual Dinner.";
         
         var utterance = new SpeechSynthesisUtterance(customSpeechText);
 
@@ -374,11 +372,29 @@
     }
 
     function unlockAudioEngine() {
+      // 🎵 Start background music on user interaction
+      var music = document.getElementById('bgMusic');
+      if (music && music.paused) {
+        music.volume = 0.4; // Set volume to 40% so it's a pleasant background level
+        music.play().catch(function(e) {
+          console.log("Audio autoplay restricted:", e);
+        });
+      }
+
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         var dummyUtterance = new SpeechSynthesisUtterance("");
         dummyUtterance.volume = 0.01;
         window.speechSynthesis.speak(dummyUtterance);
+      }
+    }
+
+    function toggleMusic() {
+      var music = document.getElementById('bgMusic');
+      if (music.paused) {
+        music.play();
+      } else {
+        music.pause();
       }
     }
 
