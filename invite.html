@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Digital Invitation - HTM Annual Dinner</title>
+  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <style>
+    :root {
+      --gold-primary: #d4af37;
+      --gold-light: #f3e5ab;
+      --gold-dark: #aa7c11;
+      --dark-bg: #0d0f12;
+    }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--dark-bg);
+      color: #ffffff;
+      margin: 0;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      /* Elegant background pattern */
+      background-image: 
+        radial-gradient(at 50% 0%, rgba(212, 175, 55, 0.15) 0px, transparent 65%),
+        linear-gradient(rgba(13, 15, 18, 0.85), rgba(13, 15, 18, 0.95)),
+        url('https://www.transparenttextures.com/patterns/black-paper.png');
+      background-size: cover;
+      background-attachment: fixed;
+    }
+
+    /* Wrap the card so the button stays visible but outside the captured screenshot area */
+    .card-wrapper {
+      width: 90%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ticket-card {
+      width: 100%;
+      box-sizing: border-box;
+      background: #161a21; /* Solid dark color for crisp image conversion */
+      border: 1px solid var(--gold-primary);
+      border-radius: 12px;
+      padding: 35px 25px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Formal gold accent line at the top */
+    .ticket-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
+    }
+
+    h2 {
+      color: var(--gold-light);
+      font-size: 22px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin: 0 0 5px 0;
+      font-weight: 300;
+    }
+
+    .subtitle {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 11px;
+      color: #8a94a6;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 25px;
+    }
+
+    .qr-frame {
+      display: inline-block;
+      padding: 12px;
+      background: #ffffff; /* Crisp contrast frame for camera scanners */
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      margin-bottom: 20px;
+    }
+
+    .guest-info {
+      margin-top: 5px;
+    }
+
+    .label {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 10px;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 2px;
+    }
+
+    .value {
+      font-size: 18px;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    /* Styled Container for Table Assignment */
+    .table-box {
+      margin-top: 12px;
+      padding: 10px 15px;
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px dashed var(--gold-primary);
+      border-radius: 8px;
+    }
+
+    .table-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--gold-light);
+      letter-spacing: 1.5px;
+      margin-top: 2px;
+    }
+
+    /* Styled Container for Lucky Draw Number */
+    .lucky-box {
+      margin-top: 12px;
+      padding: 12px 15px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(22, 26, 33, 0.95));
+      border: 1px solid var(--gold-primary);
+      border-radius: 8px;
+    }
+
+    .lucky-value {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+      margin-top: 2px;
+    }
+
+    .footer-note {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 11px;
+      color: #718096;
+      margin-top: 20px;
+      border-top: 1px solid rgba(214, 175, 87, 0.2);
+      padding-top: 12px;
+    }
+
+    /* Gold Save Pass Button */
+    .download-btn {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
+      color: #0d0f12;
+      border: none;
+      border-radius: 6px;
+      padding: 14px 24px;
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      width: 100%;
+      margin-top: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .download-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-wrapper">
+    <div class="ticket-card" id="my-ticket">
+      <h2>HTM Annual Dinner 2026</h2>
+      <div class="subtitle">Official Admission Pass</div>
+
+      <div class="qr-frame">
+        <div id="qrcode"></div>
+      </div>
+
+      <div class="guest-info">
+        <div class="label">Guest Code</div>
+        <div id="display-id" class="value" style="font-family: monospace; letter-spacing: 1px;">-</div>
+        
+        <div class="table-box">
+          <div class="label">Table Assignment</div>
+          <div id="display-table" class="table-value">-</div>
+        </div>
+
+        <!-- 🎟️ Lucky Draw Display Box -->
+        <div class="lucky-box">
+          <div class="label">Lucky Draw No.</div>
+          <div id="display-lucky" class="lucky-value">🎟️ -</div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Please present this digital pass at the entrance concierge for rapid seating verification.
+      </div>
+    </div>
+
+    <button id="download-pass-btn" class="download-btn">Save Pass to Phone</button>
+  </div>
+
+  <script>
+    // Robust, case-insensitive parameter reader
+    function getUrlParam(paramName) {
+      var params = new URLSearchParams(window.location.search);
+      for (var key of params.keys()) {
+        if (key.toLowerCase() === paramName.toLowerCase()) {
+          return params.get(key);
+        }
+      }
+      return null;
+    }
+
+    window.onload = function() {
+      // 1. Read Guest ID, Table Assignment, and Lucky Draw No. safely
+      var guestId = getUrlParam('id') || "HTM-GUEST";
+      
+      // Fallback checks across common URL parameter variations
+      var tableNo = getUrlParam('Table_Number') || 
+                    getUrlParam('table_number') || 
+                    getUrlParam('table') || 
+                    getUrlParam('table_no') || 
+                    "UNASSIGNED";
+
+      var luckyDrawNo = getUrlParam('Lucky_Draw_No') || 
+                        getUrlParam('luckydraw') || 
+                        getUrlParam('lucky_draw') || 
+                        getUrlParam('luckydrawno') || 
+                        getUrlParam('lucky') || 
+                        "-";
+
+      // Clean up encoded spaces/characters (%20 to space, etc.)
+      guestId = decodeURIComponent(guestId);
+      tableNo = decodeURIComponent(tableNo);
+      luckyDrawNo = decodeURIComponent(luckyDrawNo);
+
+      // 2. Render text onto the card interface
+      document.getElementById('display-id').innerText = guestId.toUpperCase();
+      document.getElementById('display-table').innerText = tableNo.toUpperCase();
+      document.getElementById('display-lucky').innerText = "🎟️ " + luckyDrawNo.toUpperCase();
+
+      // 3. Build the combined payload for the scanner
+      var qrPayload = "ID: " + guestId.toUpperCase() + 
+                      " | TABLE: " + tableNo.toUpperCase() + 
+                      " | LUCKY: " + luckyDrawNo.toUpperCase();
+
+      // 4. Generate the QR Code
+      var qrCode = new QRCodeStyling({
+        width: 240,
+        height: 240,
+        type: "svg",
+        data: qrPayload,
+        dotsOptions: {
+          color: "#000000",
+          type: "square"
+        },
+        backgroundOptions: {
+          color: "#ffffff",
+        },
+        cornersSquareOptions: {
+          color: "#000000",
+          type: "square"
+        },
+        cornersDotOptions: {
+          color: "#000000",
+          type: "square"
+        }
+      });
+
+      qrCode.append(document.getElementById("qrcode"));
+
+      // 5. Screenshot Download Execution
+     // document.getElementById("download-pass-btn").addEventListener("click", function() {
+        //var ticketElement = document.getElementById("my-ticket");
+        
+        //html2canvas(ticketElement, {
+         // scale: 3,             // High DPI render for mobile screen quality
+         // useCORS: true,        // Safely loads assets
+         // backgroundColor: null // Preserves rounded corner styling
+       // }).then(function(canvas) {
+        // var imagePath = canvas.toDataURL("image/png");
+          
+         // var downloadLink = document.createElement("a");
+         // downloadLink.download = "HTM_Dinner_Pass_" + guestId.toUpperCase() + ".png";
+          //downloadLink.href = imagePath;
+          
+        // document.body.appendChild(downloadLink);
+        //  downloadLink.click();
+         // document.body.removeChild(downloadLink);
+      // 5. iOS-Compatible Screenshot Download & Share Execution
+      document.getElementById("download-pass-btn").addEventListener("click", function() {
+        var ticketElement = document.getElementById("my-ticket");
+        var btn = this;
+        btn.innerText = "Generating Pass...";
+        
+        html2canvas(ticketElement, {
+          scale: 3,             // High DPI render for mobile screen quality
+          useCORS: true,        // Safely loads assets
+          backgroundColor: null // Preserves rounded corner styling
+        }).then(function(canvas) {
+          
+          // Convert canvas to Blob for native file handling
+          canvas.toBlob(function(blob) {
+            if (!blob) {
+              alert("Failed to generate pass image.");
+              btn.innerText = "Save Pass to Phone";
+              return;
+            }
+
+            var fileName = "HTM_Dinner_Pass_" + guestId.toUpperCase() + ".png";
+            var file = new File([blob], fileName, { type: "image/png" });
+
+            // 📱 Fix for iPhones: Use Native Share Sheet if available
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              navigator.share({
+                files: [file],
+                title: "HTM Annual Dinner Pass",
+                text: "Here is my official digital pass for the HTM Annual Dinner."
+              }).then(function() {
+                btn.innerText = "Save Pass to Phone";
+              }).catch(function(err) {
+                console.log("Share cancelled or failed:", err);
+                btn.innerText = "Save Pass to Phone";
+              });
+            } else {
+              // 💻 Fallback for standard Desktop downloads
+              var imagePath = URL.createObjectURL(blob);
+              var downloadLink = document.createElement("a");
+              downloadLink.download = fileName;
+              downloadLink.href = imagePath;
+              
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+              document.body.removeChild(downloadLink);
+              
+              setTimeout(function() {
+                URL.revokeObjectURL(imagePath);
+                btn.innerText = "Save Pass to Phone";
+              }, 1000);
+            }
+          }, "image/png");
+
+        }).catch(function(err) {
+          console.error("Canvas error:", err);
+          alert("Could not generate image. Please try taking a screenshot instead.");
+          btn.innerText = "Save Pass to Phone";
+        });
+      });
+    };
+  </script>
+</body>
+</html>
