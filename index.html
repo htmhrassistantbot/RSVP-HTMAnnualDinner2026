@@ -246,9 +246,9 @@
 </head>
 <body>
 
-  <!-- 🎵 BACKGROUND MUSIC AUDIO ELEMENT -->
+  <!-- 🎵 BACKGROUND MUSIC AUDIO ELEMENT (Using GitHub MP3) -->
   <audio id="bgMusic" loop>
-    <source src="https://lh3.googleusercontent.com/d/1CZfTsnk_VJar_V6K0_82KZC1geWdBy9V" type="audio/mpeg">
+    <source src="Hotel Music.mp3" type="audio/mpeg">
   </audio>
 
   <!-- 🌟 BACKGROUND SLIDESHOW LAYERS 🌟 -->
@@ -276,10 +276,10 @@
   <script>
     // 📸 SLIDESHOW CONFIGURATION - 5 Photos
     var wallpaperList = [
-      "https://lh3.googleusercontent.com/d/10Fg6IY8TQnL3gxxE7bZ11cmfd6QEBLPa",
-      "https://lh3.googleusercontent.com/d/1gcrO3Zlthjwa-DMVfUHfJsLJVQVJr2P5",
-      "https://lh3.googleusercontent.com/d/1fbTblXhgHX8O5Cg0GUPQqPkA45JPZ6Gq",
-      "https://lh3.googleusercontent.com/d/10NUMNL0BmOQD_zNCM29O7DGGNb6cIQob"
+      "https://lh3.googleusercontent.com/d/1H4Sz6aYgL1E6g3vlJab3cgkJOT0oXFeY",
+      "https://lh3.googleusercontent.com/d/1OQ9X-ZzaJR28-wkfj4nwvK5xKUOm9Wzu",
+      "https://lh3.googleusercontent.com/d/1JsBa8-vjMu69Rq7bFRHW9Wx4eV7qfNWr",
+      "https://lh3.googleusercontent.com/d/1dsvAMmyuWcKb-5i5ytIMqQ7n7-e7x1u0"
     ];
     var currentBgIndex = 0;
     var activeSlide = 1;
@@ -309,7 +309,7 @@
     var html5QrcodeScanner;
     var isProcessing = false;
     
-    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
     // 🔊 AUDIO / SPEECH ENGINE SETUP
     var availableVoices = [];
@@ -375,7 +375,7 @@
       // 🎵 Start background music on user interaction
       var music = document.getElementById('bgMusic');
       if (music && music.paused) {
-        music.volume = 0.4; // Set volume to 40% so it's a pleasant background level
+        music.volume = 0.4;
         music.play().catch(function(e) {
           console.log("Audio autoplay restricted:", e);
         });
@@ -449,7 +449,7 @@
           if (parts[0] === "SUCCESS") {
             var displayName = parts[1];    
             var calculatedTable = qrTable || parts[2] || "UNASSIGNED"; 
-            var displayOutlet = parts[3] || "-";   
+            var displayOutlet = parts[3] || "-";    
             var luckyDrawNo = parts[4] || "-";
             
             resultDiv.classList.add('animate-entrance');
