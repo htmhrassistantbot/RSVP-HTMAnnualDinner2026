@@ -111,6 +111,14 @@
       margin-bottom: 12px;
     }
 
+    .name-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
     /* Styled Container for Table Assignment */
     .table-box {
       margin-top: 12px;
@@ -193,7 +201,7 @@
         <!-- 👤 Attendee Name (Above Guest Code) -->
         <div class="label">Attendee Name</div>
         <div id="display-name" class="name-value">-</div>
-        
+
         <div class="label">Guest Code</div>
         <div id="display-id" class="value" style="font-family: monospace; letter-spacing: 1px;">-</div>
         
@@ -230,7 +238,12 @@
     }
 
     window.onload = function() {
-      // 1. Read Guest ID, Table Assignment, and Lucky Draw No. safely
+      // 1. Read Guest Name, ID, Table Assignment, and Lucky Draw No. safely
+      var guestName = getUrlParam('name') || 
+                      getUrlParam('attendee') || 
+                      getUrlParam('guest_name') || 
+                      "HONORED GUEST";
+
       var guestId = getUrlParam('id') || "HTM-GUEST";
       
       // Fallback checks across common URL parameter variations
@@ -248,17 +261,20 @@
                         "-";
 
       // Clean up encoded spaces/characters (%20 to space, etc.)
+      guestName = decodeURIComponent(guestName);
       guestId = decodeURIComponent(guestId);
       tableNo = decodeURIComponent(tableNo);
       luckyDrawNo = decodeURIComponent(luckyDrawNo);
 
       // 2. Render text onto the card interface
+      document.getElementById('display-name').innerText = guestName.toUpperCase();
       document.getElementById('display-id').innerText = guestId.toUpperCase();
       document.getElementById('display-table').innerText = tableNo.toUpperCase();
       document.getElementById('display-lucky').innerText = "🎟️ " + luckyDrawNo.toUpperCase();
 
       // 3. Build the combined payload for the scanner
-      var qrPayload = "ID: " + guestId.toUpperCase() + 
+      var qrPayload = "NAME: " + guestName.toUpperCase() + 
+                      " | ID: " + guestId.toUpperCase() + 
                       " | TABLE: " + tableNo.toUpperCase() + 
                       " | LUCKY: " + luckyDrawNo.toUpperCase();
 
@@ -287,24 +303,6 @@
 
       qrCode.append(document.getElementById("qrcode"));
 
-      // 5. Screenshot Download Execution
-     // document.getElementById("download-pass-btn").addEventListener("click", function() {
-        //var ticketElement = document.getElementById("my-ticket");
-        
-        //html2canvas(ticketElement, {
-         // scale: 3,             // High DPI render for mobile screen quality
-         // useCORS: true,        // Safely loads assets
-         // backgroundColor: null // Preserves rounded corner styling
-       // }).then(function(canvas) {
-        // var imagePath = canvas.toDataURL("image/png");
-          
-         // var downloadLink = document.createElement("a");
-         // downloadLink.download = "HTM_Dinner_Pass_" + guestId.toUpperCase() + ".png";
-          //downloadLink.href = imagePath;
-          
-        // document.body.appendChild(downloadLink);
-        //  downloadLink.click();
-         // document.body.removeChild(downloadLink);
       // 5. iOS-Compatible Screenshot Download & Share Execution
       document.getElementById("download-pass-btn").addEventListener("click", function() {
         var ticketElement = document.getElementById("my-ticket");
@@ -317,7 +315,6 @@
           backgroundColor: null // Preserves rounded corner styling
         }).then(function(canvas) {
           
-          // Convert canvas to Blob for native file handling
           canvas.toBlob(function(blob) {
             if (!blob) {
               alert("Failed to generate pass image.");
