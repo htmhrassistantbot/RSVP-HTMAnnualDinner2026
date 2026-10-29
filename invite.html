@@ -83,7 +83,7 @@
       margin-bottom: 25px;
     }
 
-    .qr-frame {
+    .-frame {
       display: inline-block;
       padding: 8px;
       background: #ffffff; /* Crisp contrast frame for camera scanners */
@@ -283,8 +283,8 @@
 
       // 4. Generate the QR Code
       var qrCode = new QRCodeStyling({
-        width: 240,
-        height: 240,
+        width: 280,
+        height: 280,
         type: "svg",
         data: qrPayload,
         dotsOptions: {
