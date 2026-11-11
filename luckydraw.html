@@ -190,16 +190,18 @@ function resumeBackgroundMusic() {
     }
     catch(err){message.textContent="Error: "+err.message;name.textContent="No winner was displayed.";
               }
-   finally
-    {
-  button.disabled=false;
-  document.getElementById("historyButton").disabled=false;
-  button.textContent="🎁 DRAW NEXT WINNER";
+   finally {
+  button.disabled = false;
+  document.getElementById("historyButton").disabled = false;
+  button.textContent = "🎁 DRAW NEXT WINNER";
 
   // Resume background music if the user enabled it
   resumeBackgroundMusic();
 }
-  async function loadHistory(showMessage){
+
+} // IMPORTANT: Closes startLuckyDraw()
+
+async function loadHistory(showMessage) {
     if(showMessage!==false)document.getElementById("message").textContent="Refreshing winner history...";
     try{
       var response=await jsonp("history"), prefix="HISTORY|";
