@@ -685,21 +685,18 @@ if (speechSupported) {
 }
 
 
+
 function announceWinner(number, winnerName) {
 
   return new Promise(function(resolve) {
 
-    if (!speechSupported) {
-
-      console.log("Speech synthesis is not supported.");
+    if (!("speechSynthesis" in window)) {
       resolve();
       return;
     }
 
-    // Stop any previous announcement.
     window.speechSynthesis.cancel();
 
-    // Speak each digit separately.
     var digits = String(number)
       .split("")
       .filter(function(d) {
@@ -707,57 +704,24 @@ function announceWinner(number, winnerName) {
       })
       .join(", ");
 
-    var announcement =
-      "Ladies and gentlemen! " +
-      "We have a lucky winner! " +
-      "The winning number is... " +
-      digits + "! " +
-      "Congratulations to " +
-      String(winnerName || "our lucky winner") +
-      "! What a wonderful moment!";
+    var speech = new SpeechSynthesisUtterance(digits);
 
-    var speech = new SpeechSynthesisUtterance(
-      announcement
-    );
-
-    // Excited event announcer settings.
-    speech.rate = 0.95;
-    speech.pitch = 1.25;
+    speech.rate = 0.85;
+    speech.pitch = 1.15;
     speech.volume = 1;
 
-    if (announcerVoice) {
-      speech.voice = announcerVoice;
-    }
+    speech.lang = "en-US";
 
-    speech.onend = function() {
-      resolve();
-    };
-
-    speech.onerror = function(error) {
-      console.log("Voice announcement error:", error);
-      resolve();
-    };
-
-    // Fallback in case the browser does not finish speaking.
-    var finished = false;
-
-    function finishAnnouncement() {
-      if (!finished) {
-        finished = true;
-        resolve();
-      }
-    }
-
-    speech.onend = finishAnnouncement;
-    speech.onerror = finishAnnouncement;
+    speech.onend = resolve;
+    speech.onerror = resolve;
 
     window.speechSynthesis.speak(speech);
 
-    // Safety timeout.
-    setTimeout(finishAnnouncement, 45000);
+    setTimeout(resolve, 15000);
 
   });
 }
+
 
 
 /****************************************************
