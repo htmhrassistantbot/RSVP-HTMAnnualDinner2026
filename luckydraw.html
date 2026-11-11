@@ -150,6 +150,23 @@
       box-shadow: none;
     }
 
+    /* STOP AWARD MUSIC BUTTON */
+    .stop-award-button {
+      margin-left: 8px;
+      padding: 9px 14px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      background: #7b2525;
+      color: #fff;
+      border: 1px solid #d46a6a;
+      box-shadow: none;
+      border-radius: 5px;
+    }
+
+    .stop-award-button:hover:not(:disabled) {
+      background: #a52a2a;
+    }
+
     .music-controls {
       margin: 0 auto 22px;
       padding: 14px;
@@ -276,9 +293,21 @@
     .reveal { animation: reveal .65s ease-out; }
 
     @media(max-width:520px) {
-      .secondary { margin: 10px 0 0; }
-      .panel { padding: 18px 12px; }
-      .stats { gap: 20px; }
+      .secondary {
+        margin: 10px 0 0;
+      }
+
+      .stop-award-button {
+        margin: 10px 0 0;
+      }
+
+      .panel {
+        padding: 18px 12px;
+      }
+
+      .stats {
+        gap: 20px;
+      }
     }
   </style>
 </head>
@@ -299,6 +328,7 @@
 
       <!-- BACKGROUND MUSIC CONTROL -->
       <div class="music-controls">
+
         <div style="color:#f3e5ab;margin-bottom:10px;letter-spacing:2px;">
           ♪ EVENT BACKGROUND MUSIC
         </div>
@@ -312,6 +342,7 @@
 
         <div class="volume-row">
           <span>VOLUME</span>
+
           <input
             type="range"
             id="musicVolume"
@@ -319,18 +350,25 @@
             max="100"
             value="25"
             oninput="changeBackgroundVolume(this.value)">
+
           <span id="volumeValue">25%</span>
         </div>
+
       </div>
 
       <div class="eyebrow">And the lucky winner is...</div>
 
       <div class="winner-box" aria-live="polite">
+
         <div id="winnerNumber">READY</div>
+
         <div id="winnerName">Good luck everyone!</div>
+
         <div id="winnerMeta"></div>
+
       </div>
 
+      <!-- START LUCKY DRAW -->
       <button
         id="drawButton"
         type="button"
@@ -338,6 +376,16 @@
         🎁 START LUCKY DRAW
       </button>
 
+      <!-- STOP AWARD MUSIC -->
+      <button
+        id="stopAwardButton"
+        class="stop-award-button"
+        type="button"
+        onclick="stopAwardMusic()">
+        ■ STOP AWARD MUSIC
+      </button>
+
+      <!-- REFRESH HISTORY -->
       <button
         id="historyButton"
         class="secondary"
@@ -351,6 +399,7 @@
       </div>
 
       <div class="stats">
+
         <div class="stat">
           <strong id="remainingCount">—</strong>
           <span>Numbers remaining</span>
@@ -360,13 +409,18 @@
           <strong id="winnerCount">—</strong>
           <span>Winners drawn</span>
         </div>
+
       </div>
 
+      <!-- WINNER HISTORY -->
       <div class="history">
+
         <h2>Winner History</h2>
 
         <div class="table-wrap">
+
           <table>
+
             <thead>
               <tr>
                 <th>No.</th>
@@ -378,14 +432,19 @@
             </thead>
 
             <tbody id="historyBody">
+
               <tr>
                 <td colspan="5" class="empty">
                   Loading winner history...
                 </td>
               </tr>
+
             </tbody>
+
           </table>
+
         </div>
+
       </div>
 
       <div class="note">
@@ -394,188 +453,192 @@
       </div>
 
     </section>
+
   </main>
 
 <script>
 
-  /****************************************************
-   * GOOGLE APPS SCRIPT URL
-   * KEEP THIS URL THE SAME AS YOUR CHECK-IN SYSTEM
-   ****************************************************/
+/****************************************************
+ * GOOGLE APPS SCRIPT URL
+ * KEEP THIS URL THE SAME AS YOUR CHECK-IN SYSTEM
+ ****************************************************/
 
-  var GOOGLE_SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
-
-
-  /****************************************************
-   * BACKGROUND SLIDESHOW
-   ****************************************************/
-
-  var wallpaperList = [
-    "bg1.jpeg",
-    "bg2.jpeg",
-    "bg3.jpeg",
-    "bg4.jpeg"
-  ];
-
-  var currentBgIndex = 0;
-  var activeSlide = 1;
-
-  function rotateWallpapers() {
-
-    if (wallpaperList.length < 2) return;
-
-    var next = (currentBgIndex + 1) % wallpaperList.length;
-
-    var current = document.getElementById(
-      activeSlide === 1 ? "slide1" : "slide2"
-    );
-
-    var target = document.getElementById(
-      activeSlide === 1 ? "slide2" : "slide1"
-    );
-
-    target.style.backgroundImage =
-      "url('" + wallpaperList[next] + "')";
-
-    target.classList.add("active");
-    current.classList.remove("active");
-
-    activeSlide = activeSlide === 1 ? 2 : 1;
-    currentBgIndex = next;
-  }
-
-  function initSlideshow() {
-
-    if (wallpaperList.length > 0) {
-
-      document.getElementById("slide1").style.backgroundImage =
-        "url('" + wallpaperList[0] + "')";
-
-      setInterval(rotateWallpapers, 6000);
-    }
-  }
+var GOOGLE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
 
 
-  /****************************************************
-   * BACKGROUND MUSIC
-   ****************************************************/
+/****************************************************
+ * BACKGROUND SLIDESHOW
+ ****************************************************/
 
-  var backgroundAudio = null;
-  var backgroundMusicEnabled = false;
-  var backgroundVolume = 0.25;
+var wallpaperList = [
+  "bg1.jpeg",
+  "bg2.jpeg",
+  "bg3.jpeg",
+  "bg4.jpeg"
+];
 
-  function setupBackgroundMusic() {
+var currentBgIndex = 0;
+var activeSlide = 1;
 
-    if (!backgroundAudio) {
+function rotateWallpapers() {
 
-      backgroundAudio = new Audio(
-        "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Intro.mp3"
-      );
+  if (wallpaperList.length < 2) return;
 
-      backgroundAudio.loop = true;
-      backgroundAudio.volume = backgroundVolume;
-    }
-  }
+  var next = (currentBgIndex + 1) % wallpaperList.length;
 
-  async function toggleBackgroundMusic() {
-
-    setupBackgroundMusic();
-
-    var button = document.getElementById("musicButton");
-
-    if (!backgroundMusicEnabled) {
-
-      try {
-
-        await backgroundAudio.play();
-
-        backgroundMusicEnabled = true;
-        button.textContent = "❚❚ PAUSE BACKGROUND MUSIC";
-
-      } catch (error) {
-
-        document.getElementById("message").textContent =
-          "Music could not play. Please check Intro.mp3.";
-
-        console.log("Background music error:", error);
-      }
-
-    } else {
-
-      backgroundAudio.pause();
-      backgroundMusicEnabled = false;
-      button.textContent = "▶ PLAY BACKGROUND MUSIC";
-    }
-  }
-
-  function changeBackgroundVolume(value) {
-
-    backgroundVolume = Number(value) / 100;
-
-    document.getElementById("volumeValue").textContent =
-      value + "%";
-
-    if (backgroundAudio) {
-      backgroundAudio.volume = backgroundVolume;
-    }
-  }
-
-  function pauseBackgroundMusic() {
-
-    if (backgroundAudio && backgroundMusicEnabled) {
-      backgroundAudio.pause();
-    }
-  }
-
-  async function resumeBackgroundMusic() {
-
-    if (backgroundAudio && backgroundMusicEnabled) {
-
-      try {
-        await backgroundAudio.play();
-      } catch (error) {
-        console.log("Could not resume background music:", error);
-      }
-    }
-  }
-
-
-  /****************************************************
-   * DRUM ROLL MUSIC
-   ****************************************************/
-
-  var drumRollAudio = new Audio(
-    "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/DrumRoll.mp3"
+  var current = document.getElementById(
+    activeSlide === 1 ? "slide1" : "slide2"
   );
 
-  drumRollAudio.loop = true;
-  drumRollAudio.volume = 0.85;
+  var target = document.getElementById(
+    activeSlide === 1 ? "slide2" : "slide1"
+  );
 
-  function startDrumRoll() {
+  target.style.backgroundImage =
+    "url('" + wallpaperList[next] + "')";
 
-    drumRollAudio.currentTime = 0;
+  target.classList.add("active");
+  current.classList.remove("active");
 
-    var playPromise = drumRollAudio.play();
+  activeSlide = activeSlide === 1 ? 2 : 1;
+  currentBgIndex = next;
+}
 
-    if (playPromise !== undefined) {
+function initSlideshow() {
 
-      playPromise.catch(function(error) {
+  if (wallpaperList.length > 0) {
 
-        console.log("Drum roll could not play:", error);
+    document.getElementById("slide1").style.backgroundImage =
+      "url('" + wallpaperList[0] + "')";
 
-        document.getElementById("message").textContent =
-          "Drum roll could not play. Please check DrumRoll.mp3.";
-      });
+    setInterval(rotateWallpapers, 6000);
+  }
+}
+
+
+/****************************************************
+ * BACKGROUND MUSIC
+ ****************************************************/
+
+var backgroundAudio = null;
+var backgroundMusicEnabled = false;
+var backgroundVolume = 0.25;
+
+function setupBackgroundMusic() {
+
+  if (!backgroundAudio) {
+
+    backgroundAudio = new Audio(
+      "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Intro.mp3"
+    );
+
+    backgroundAudio.loop = true;
+    backgroundAudio.volume = backgroundVolume;
+  }
+}
+
+async function toggleBackgroundMusic() {
+
+  setupBackgroundMusic();
+
+  var button = document.getElementById("musicButton");
+
+  if (!backgroundMusicEnabled) {
+
+    try {
+
+      await backgroundAudio.play();
+
+      backgroundMusicEnabled = true;
+      button.textContent = "❚❚ PAUSE BACKGROUND MUSIC";
+
+    } catch (error) {
+
+      document.getElementById("message").textContent =
+        "Music could not play. Please check Intro.mp3.";
+
+      console.log("Background music error:", error);
+    }
+
+  } else {
+
+    backgroundAudio.pause();
+    backgroundMusicEnabled = false;
+
+    button.textContent = "▶ PLAY BACKGROUND MUSIC";
+  }
+}
+
+function changeBackgroundVolume(value) {
+
+  backgroundVolume = Number(value) / 100;
+
+  document.getElementById("volumeValue").textContent =
+    value + "%";
+
+  if (backgroundAudio) {
+    backgroundAudio.volume = backgroundVolume;
+  }
+}
+
+function pauseBackgroundMusic() {
+
+  if (backgroundAudio && backgroundMusicEnabled) {
+    backgroundAudio.pause();
+  }
+}
+
+async function resumeBackgroundMusic() {
+
+  if (backgroundAudio && backgroundMusicEnabled) {
+
+    try {
+      await backgroundAudio.play();
+    } catch (error) {
+      console.log("Could not resume background music:", error);
     }
   }
+}
 
-  function stopDrumRoll() {
 
-    drumRollAudio.pause();
-    drumRollAudio.currentTime = 0;
+/****************************************************
+ * DRUM ROLL MUSIC
+ ****************************************************/
+
+var drumRollAudio = new Audio(
+  "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/DrumRoll.mp3"
+);
+
+drumRollAudio.loop = true;
+drumRollAudio.volume = 0.85;
+
+function startDrumRoll() {
+
+  drumRollAudio.currentTime = 0;
+
+  var playPromise = drumRollAudio.play();
+
+  if (playPromise !== undefined) {
+
+    playPromise.catch(function(error) {
+
+      console.log("Drum roll could not play:", error);
+
+      document.getElementById("message").textContent =
+        "Drum roll could not play. Please check DrumRoll.mp3.";
+    });
   }
-  /****************************************************
+}
+
+function stopDrumRoll() {
+
+  drumRollAudio.pause();
+  drumRollAudio.currentTime = 0;
+}
+
+
+/****************************************************
  * AWARD CELEBRATION MUSIC
  ****************************************************/
 
@@ -587,92 +650,109 @@ awardAudio.loop = false;
 awardAudio.volume = 0.85;
 
 function playAwardMusic() {
+
   awardAudio.currentTime = 0;
 
   awardAudio.play().catch(function(error) {
+
     console.log("Award music could not play:", error);
+
   });
 }
 
 
-  /****************************************************
-   * GOOGLE APPS SCRIPT JSONP CONNECTION
-   ****************************************************/
+/****************************************************
+ * HOST CONTROL: STOP AWARD MUSIC
+ ****************************************************/
 
-  var requestTimer = null;
+function stopAwardMusic() {
 
-  function jsonp(action) {
+  awardAudio.pause();
+  awardAudio.currentTime = 0;
 
-    return new Promise(function(resolve, reject) {
+  document.getElementById("message").textContent =
+    "Award celebration music stopped by host.";
+}
 
-      var old = document.getElementById("luckyDrawRequest");
 
-      if (old) old.remove();
+/****************************************************
+ * GOOGLE APPS SCRIPT JSONP CONNECTION
+ ****************************************************/
 
-      var callback = "handleLuckyDrawResponse";
+var requestTimer = null;
 
-      window[callback] = function(response) {
-        cleanup();
-        resolve(response);
-      };
+function jsonp(action) {
 
-      var script = document.createElement("script");
+  return new Promise(function(resolve, reject) {
 
-      script.id = "luckyDrawRequest";
+    var old = document.getElementById("luckyDrawRequest");
 
-      script.src =
-        GOOGLE_SCRIPT_URL +
-        "?action=" + encodeURIComponent(action) +
-        "&callback=" + callback;
+    if (old) old.remove();
 
-      script.onerror = function() {
+    var callback = "handleLuckyDrawResponse";
 
-        cleanup();
+    window[callback] = function(response) {
+      cleanup();
+      resolve(response);
+    };
 
-        reject(
-          new Error("Could not connect to Google Apps Script.")
-        );
-      };
+    var script = document.createElement("script");
 
-      requestTimer = setTimeout(function() {
+    script.id = "luckyDrawRequest";
 
-        cleanup();
+    script.src =
+      GOOGLE_SCRIPT_URL +
+      "?action=" + encodeURIComponent(action) +
+      "&callback=" + callback;
 
-        reject(
-          new Error(
-            "The request timed out. Please check your connection and try again."
-          )
-        );
+    script.onerror = function() {
 
-      }, 30000);
+      cleanup();
 
-      function cleanup() {
+      reject(
+        new Error("Could not connect to Google Apps Script.")
+      );
+    };
 
-        if (requestTimer) {
-          clearTimeout(requestTimer);
-        }
+    requestTimer = setTimeout(function() {
 
-        requestTimer = null;
+      cleanup();
 
-        script.remove();
+      reject(
+        new Error(
+          "The request timed out. Please check your connection and try again."
+        )
+      );
 
-        try {
-          delete window[callback];
-        } catch (e) {
-          window[callback] = undefined;
-        }
+    }, 30000);
+
+    function cleanup() {
+
+      if (requestTimer) {
+        clearTimeout(requestTimer);
       }
 
-      document.body.appendChild(script);
-    });
-  }
+      requestTimer = null;
+
+      script.remove();
+
+      try {
+        delete window[callback];
+      } catch (e) {
+        window[callback] = undefined;
+      }
+    }
+
+    document.body.appendChild(script);
+  });
+}
 
 
-  /****************************************************
-   * START LUCKY DRAW
-   ****************************************************/
+/****************************************************
+ * START LUCKY DRAW
+ ****************************************************/
 
- async function startLuckyDraw() {
+async function startLuckyDraw() {
 
   var button = document.getElementById("drawButton");
   var historyButton = document.getElementById("historyButton");
@@ -712,10 +792,13 @@ function playAwardMusic() {
 
     // Drum roll plays for at least 4 seconds.
     var results = await Promise.all([
+
       jsonp("draw"),
+
       new Promise(function(resolve) {
         setTimeout(resolve, 4000);
       })
+
     ]);
 
     var response = results[0];
@@ -736,7 +819,9 @@ function playAwardMusic() {
       number.classList.add("reveal");
 
       name.textContent = p[2] || "Winner";
-      meta.textContent = "Guest ID: " + (p[3] || "-");
+
+      meta.textContent =
+        "Guest ID: " + (p[3] || "-");
 
       document.getElementById("remainingCount").textContent =
         p[4];
@@ -752,7 +837,10 @@ function playAwardMusic() {
     } else if (p[0] === "EMPTY") {
 
       number.textContent = "FINISHED";
-      name.textContent = "All eligible numbers have been drawn.";
+
+      name.textContent =
+        "All eligible numbers have been drawn.";
+
       meta.textContent = "";
 
       message.textContent = "No numbers remain.";
@@ -771,6 +859,7 @@ function playAwardMusic() {
     stopDrumRoll();
 
     message.textContent = "Error: " + err.message;
+
     name.textContent = "No winner was displayed.";
 
   } finally {
@@ -789,123 +878,125 @@ function playAwardMusic() {
   }
 }
 
-  /****************************************************
-   * LOAD WINNER HISTORY
-   ****************************************************/
 
-  async function loadHistory(showMessage) {
+/****************************************************
+ * LOAD WINNER HISTORY
+ ****************************************************/
+
+async function loadHistory(showMessage) {
+
+  if (showMessage !== false) {
+
+    document.getElementById("message").textContent =
+      "Refreshing winner history...";
+  }
+
+  try {
+
+    var response = await jsonp("history");
+
+    var prefix = "HISTORY|";
+
+    if (String(response).indexOf(prefix) !== 0) {
+
+      throw new Error(String(response));
+    }
+
+    var payload = JSON.parse(
+      String(response).slice(prefix.length)
+    );
+
+    var items = payload.winners || [];
+
+    var body =
+      document.getElementById("historyBody");
+
+    document.getElementById("winnerCount").textContent =
+      items.length;
+
+    document.getElementById("remainingCount").textContent =
+      payload.remaining;
+
+    if (!items.length) {
+
+      body.innerHTML =
+        '<tr><td colspan="5" class="empty">' +
+        'No winners yet. The draw is ready.' +
+        '</td></tr>';
+
+    } else {
+
+      body.innerHTML = items.map(function(x, i) {
+
+        return '<tr>' +
+          '<td>' + (i + 1) + '</td>' +
+          '<td>' + escapeHtml(x.number) + '</td>' +
+          '<td>' + escapeHtml(x.name) + '</td>' +
+          '<td>' + escapeHtml(x.id) + '</td>' +
+          '<td>' + escapeHtml(x.time) + '</td>' +
+          '</tr>';
+
+      }).join("");
+    }
 
     if (showMessage !== false) {
 
       document.getElementById("message").textContent =
-        "Refreshing winner history...";
+        "Winner history updated.";
     }
 
-    try {
+  } catch (err) {
 
-      var response = await jsonp("history");
+    document.getElementById("historyBody").innerHTML =
+      '<tr><td colspan="5" class="empty">' +
+      'Could not load history: ' +
+      escapeHtml(err.message) +
+      '</td></tr>';
 
-      var prefix = "HISTORY|";
+    if (showMessage !== false) {
 
-      if (String(response).indexOf(prefix) !== 0) {
-
-        throw new Error(String(response));
-      }
-
-      var payload = JSON.parse(
-        String(response).slice(prefix.length)
-      );
-
-      var items = payload.winners || [];
-
-      var body =
-        document.getElementById("historyBody");
-
-      document.getElementById("winnerCount").textContent =
-        items.length;
-
-      document.getElementById("remainingCount").textContent =
-        payload.remaining;
-
-      if (!items.length) {
-
-        body.innerHTML =
-          '<tr><td colspan="5" class="empty">' +
-          'No winners yet. The draw is ready.' +
-          '</td></tr>';
-
-      } else {
-
-        body.innerHTML = items.map(function(x, i) {
-
-          return '<tr>' +
-            '<td>' + (i + 1) + '</td>' +
-            '<td>' + escapeHtml(x.number) + '</td>' +
-            '<td>' + escapeHtml(x.name) + '</td>' +
-            '<td>' + escapeHtml(x.id) + '</td>' +
-            '<td>' + escapeHtml(x.time) + '</td>' +
-            '</tr>';
-
-        }).join("");
-      }
-
-      if (showMessage !== false) {
-
-        document.getElementById("message").textContent =
-          "Winner history updated.";
-      }
-
-    } catch (err) {
-
-      document.getElementById("historyBody").innerHTML =
-        '<tr><td colspan="5" class="empty">' +
-        'Could not load history: ' +
-        escapeHtml(err.message) +
-        '</td></tr>';
-
-      if (showMessage !== false) {
-
-        document.getElementById("message").textContent =
-          "History could not be loaded.";
-      }
+      document.getElementById("message").textContent =
+        "History could not be loaded.";
     }
   }
+}
 
 
-  /****************************************************
-   * HTML SECURITY HELPER
-   ****************************************************/
+/****************************************************
+ * HTML SECURITY HELPER
+ ****************************************************/
 
-  function escapeHtml(value) {
+function escapeHtml(value) {
 
-    return String(value == null ? "" : value).replace(
-      /[&<>"']/g,
-      function(c) {
+  return String(value == null ? "" : value).replace(
+    /[&<>"']/g,
+    function(c) {
 
-        return {
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        }[c];
-      }
-    );
-  }
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[c];
+    }
+  );
+}
 
 
-  /****************************************************
-   * PAGE INITIALIZATION
-   ****************************************************/
+/****************************************************
+ * PAGE INITIALIZATION
+ ****************************************************/
 
-  window.addEventListener("load", function() {
+window.addEventListener("load", function() {
 
-    initSlideshow();
+  initSlideshow();
 
-    loadHistory();
+  loadHistory();
 
-    setupBackgroundMusic();
-  });
+  setupBackgroundMusic();
+
+});
 
 </script>
 
