@@ -42,6 +42,25 @@
         <div id="winnerName">Good luck everyone!</div>
         <div id="winnerMeta"></div>
       </div>
+      
+<div style="margin:15px 0;">
+  <button id="backgroundMusicButton"
+          type="button"
+          onclick="toggleBackgroundMusic()">
+    🎵 ENABLE BACKGROUND MUSIC
+  </button>
+
+  <div style="margin-top:12px;">
+    <label for="musicVolume">Background Music Volume</label>
+    <input id="musicVolume"
+           type="range"
+           min="0"
+           max="100"
+           value="25"
+           oninput="changeBackgroundVolume(this.value)">
+  </div>
+</div>
+
       <button id="drawButton" type="button" onclick="startLuckyDraw()">🎁 START LUCKY DRAW</button>
       <button id="historyButton" class="secondary" type="button" onclick="loadHistory()">REFRESH WINNER HISTORY</button>
       <div id="message" role="status">Ready to draw one winner.</div>
@@ -77,6 +96,65 @@
   function initSlideshow(){
     if(wallpaperList.length){document.getElementById("slide1").style.backgroundImage="url('"+wallpaperList[0]+"')";setInterval(rotateWallpapers,6000);}
   }
+  
+// ========================================
+// CONTINUOUS BACKGROUND MUSIC
+// ========================================
+
+var backgroundAudio = null;
+var backgroundMusicEnabled = false;
+
+function setupBackgroundMusic() {
+  if (!backgroundAudio) {
+    backgroundAudio = new Audio(
+      "https://cdn.pixabay.com/audio/2022/10/25/audio_946b2c8c4b.mp3"
+    );
+
+    backgroundAudio.loop = true;
+    backgroundAudio.volume = 0.25;
+  }
+}
+
+async function toggleBackgroundMusic() {
+  setupBackgroundMusic();
+
+  var button = document.getElementById("backgroundMusicButton");
+
+  try {
+    if (!backgroundMusicEnabled) {
+      await backgroundAudio.play();
+
+      backgroundMusicEnabled = true;
+      button.textContent = "🔇 MUTE BACKGROUND MUSIC";
+
+    } else {
+      backgroundAudio.pause();
+
+      backgroundMusicEnabled = false;
+      button.textContent = "🎵 ENABLE BACKGROUND MUSIC";
+    }
+  } catch (error) {
+    button.textContent = "Unable to play music - try again";
+  }
+}
+
+function changeBackgroundVolume(value) {
+  setupBackgroundMusic();
+  backgroundAudio.volume = Number(value) / 100;
+}
+
+function pauseBackgroundMusic() {
+  if (backgroundAudio && !backgroundAudio.paused) {
+    backgroundAudio.pause();
+  }
+}
+
+function resumeBackgroundMusic() {
+  if (backgroundAudio && backgroundMusicEnabled) {
+    backgroundAudio.play().catch(function() {});
+  }
+}
+
   function jsonp(action){
     return new Promise(function(resolve,reject){
       var old=document.getElementById("luckyDrawRequest"); if(old) old.remove();
@@ -90,7 +168,9 @@
       document.body.appendChild(script);
     });
   }
-  async function startLuckyDraw(){
+  async function startLuckyDraw()
+  {
+    pauseBackgroundMusic();
     var button=document.getElementById("drawButton"), number=document.getElementById("winnerNumber"), name=document.getElementById("winnerName"), meta=document.getElementById("winnerMeta"), message=document.getElementById("message");
     button.disabled=true; document.getElementById("historyButton").disabled=true;
     button.textContent="DRAWING..."; number.textContent="✦"; name.textContent="Selecting one eligible number..."; meta.textContent=""; message.textContent="Please wait. Do not refresh this page.";
@@ -105,10 +185,20 @@
       }else if(p[0]==="EMPTY"){
         number.textContent="FINISHED";name.textContent="All eligible numbers have been drawn.";message.textContent="No numbers remain.";
         document.getElementById("remainingCount").textContent="0";
-      }else{throw new Error(p.slice(1).join("|")||"Unknown response from server.");}
-    }catch(err){message.textContent="Error: "+err.message;name.textContent="No winner was displayed.";}
-    finally{button.disabled=false;document.getElementById("historyButton").disabled=false;button.textContent="🎁 DRAW NEXT WINNER";}
-  }
+      }
+      else{throw new Error(p.slice(1).join("|")||"Unknown response from server.");}
+    }
+    catch(err){message.textContent="Error: "+err.message;name.textContent="No winner was displayed.";
+              }
+   finally
+    {
+  button.disabled=false;
+  document.getElementById("historyButton").disabled=false;
+  button.textContent="🎁 DRAW NEXT WINNER";
+
+  // Resume background music if the user enabled it
+  resumeBackgroundMusic();
+}
   async function loadHistory(showMessage){
     if(showMessage!==false)document.getElementById("message").textContent="Refreshing winner history...";
     try{
