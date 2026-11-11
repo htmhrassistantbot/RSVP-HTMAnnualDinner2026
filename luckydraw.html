@@ -2,469 +2,450 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HTM Annual Dinner 2026 - Lucky Draw</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTM Annual Dinner 2026 - Lucky Draw</title>
 
-  <style>
-    :root {
-      --gold: #d4af37;
-      --gold-light: #f3e5ab;
-      --bg: #0d0f12;
-      --panel: rgba(22,26,33,.94);
-    }
+<style>
+:root {
+  --gold:#d4af37;
+  --gold-light:#f3e5ab;
+  --bg:#0d0f12;
+  --panel:rgba(22,26,33,.94);
+}
 
-    * { box-sizing: border-box; }
+* { box-sizing:border-box; }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      padding: 28px 16px 48px;
-      color: #fff;
-      text-align: center;
-      font-family: Georgia, 'Times New Roman', serif;
-      background: var(--bg);
-      overflow-x: hidden;
-    }
+body {
+  margin:0;
+  min-height:100vh;
+  padding:28px 16px 48px;
+  color:#fff;
+  text-align:center;
+  font-family:Georgia,'Times New Roman',serif;
+  background:var(--bg);
+  overflow-x:hidden;
+}
 
-    .bg-slide {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      background-position: center;
-      background-size: cover;
-      opacity: 0;
-      transition: opacity 1.5s;
-    }
+.bg-slide {
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  background-position:center;
+  background-size:cover;
+  opacity:0;
+  transition:opacity 1.5s;
+}
 
-    .bg-slide.active { opacity: 1; }
+.bg-slide.active { opacity:1; }
 
-    .bg-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background: rgba(13,15,18,.84);
-      pointer-events: none;
-    }
+.bg-overlay {
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  background:rgba(13,15,18,.84);
+  pointer-events:none;
+}
 
-    h1 {
-      margin: 12px 0 6px;
-      color: var(--gold-light);
-      font-size: clamp(23px,4vw,34px);
-      font-weight: 400;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      text-shadow: 0 2px 5px #000;
-    }
+h1 {
+  margin:12px 0 6px;
+  color:var(--gold-light);
+  font-size:clamp(23px,4vw,34px);
+  font-weight:400;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  text-shadow:0 2px 5px #000;
+}
 
-    .subtitle {
-      font: 11px 'Segoe UI',sans-serif;
-      color: #a0a8b5;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-bottom: 30px;
-    }
+.subtitle {
+  font:11px 'Segoe UI',sans-serif;
+  color:#a0a8b5;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:30px;
+}
 
-    .wrap {
-      max-width: 760px;
-      margin: auto;
-    }
+.wrap {
+  max-width:760px;
+  margin:auto;
+}
 
-    .panel {
-      padding: clamp(20px,4vw,36px);
-      border: 1px solid var(--gold);
-      border-radius: 12px;
-      background: var(--panel);
-      box-shadow: 0 20px 50px #0009;
-    }
+.panel {
+  padding:clamp(20px,4vw,36px);
+  border:1px solid var(--gold);
+  border-radius:12px;
+  background:var(--panel);
+  box-shadow:0 20px 50px #0009;
+}
 
-    .eyebrow {
-      font: 11px 'Segoe UI',sans-serif;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
+.eyebrow {
+  font:11px 'Segoe UI',sans-serif;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--gold);
+}
 
-    .winner-box {
-      margin: 20px auto 22px;
-      padding: 25px 12px;
-      border: 1px solid #8b6b1b;
-      border-radius: 10px;
-      background: linear-gradient(135deg,#d4af371c,#0008);
-      min-height: 180px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+.winner-box {
+  margin:20px auto 22px;
+  padding:25px 12px;
+  border:1px solid #8b6b1b;
+  border-radius:10px;
+  background:linear-gradient(135deg,#d4af371c,#0008);
+  min-height:180px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
 
-    #winnerNumber {
-      font-size: clamp(58px,12vw,96px);
-      line-height: 1.05;
-      font-weight: bold;
-      color: var(--gold-light);
-      letter-spacing: 5px;
-      text-shadow: 0 0 24px #d4af3755;
-      overflow-wrap: anywhere;
-    }
+#winnerNumber {
+  font-size:clamp(58px,12vw,96px);
+  line-height:1.05;
+  font-weight:bold;
+  color:var(--gold-light);
+  letter-spacing:5px;
+  text-shadow:0 0 24px #d4af3755;
+  overflow-wrap:anywhere;
+}
 
-    #winnerName {
-      font-size: clamp(18px,3vw,25px);
-      margin-top: 12px;
-      color: #fff;
-    }
+#winnerName {
+  font-size:clamp(18px,3vw,25px);
+  margin-top:12px;
+  color:#fff;
+}
 
-    #winnerMeta {
-      font: 12px 'Segoe UI',sans-serif;
-      color: #a0a8b5;
-      margin-top: 8px;
-    }
+#winnerMeta {
+  font:12px 'Segoe UI',sans-serif;
+  color:#a0a8b5;
+  margin-top:8px;
+}
 
-    button {
-      border: 0;
-      border-radius: 6px;
-      padding: 15px 28px;
-      background: linear-gradient(#f3e5ab,#d4af37);
-      color: #171717;
-      font: 700 13px 'Segoe UI',sans-serif;
-      letter-spacing: 2px;
-      cursor: pointer;
-      box-shadow: 0 5px 18px #0008;
-      transition: transform .15s,opacity .15s;
-    }
+button {
+  border:0;
+  border-radius:6px;
+  padding:15px 28px;
+  background:linear-gradient(#f3e5ab,#d4af37);
+  color:#171717;
+  font:700 13px 'Segoe UI',sans-serif;
+  letter-spacing:2px;
+  cursor:pointer;
+  box-shadow:0 5px 18px #0008;
+  transition:transform .15s,opacity .15s;
+}
 
-    button:hover:not(:disabled) {
-      transform: translateY(-2px);
-    }
+button:hover:not(:disabled) {
+  transform:translateY(-2px);
+}
 
-    button:disabled {
-      opacity: .55;
-      cursor: wait;
-    }
+button:disabled {
+  opacity:.55;
+  cursor:wait;
+}
 
-    .secondary {
-      margin-left: 8px;
-      background: transparent;
-      border: 1px solid var(--gold);
-      color: var(--gold-light);
-      box-shadow: none;
-    }
+.secondary {
+  margin-left:8px;
+  background:transparent;
+  border:1px solid var(--gold);
+  color:var(--gold-light);
+  box-shadow:none;
+}
 
-    /* STOP AWARD MUSIC BUTTON */
-    .stop-award-button {
-      margin-left: 8px;
-      padding: 9px 14px;
-      font-size: 10px;
-      letter-spacing: 1px;
-      background: #7b2525;
-      color: #fff;
-      border: 1px solid #d46a6a;
-      box-shadow: none;
-      border-radius: 5px;
-    }
+.stop-award-button {
+  margin-left:8px;
+  padding:9px 14px;
+  font-size:10px;
+  letter-spacing:1px;
+  background:#7b2525;
+  color:#fff;
+  border:1px solid #d46a6a;
+  box-shadow:none;
+  border-radius:5px;
+}
 
-    .stop-award-button:hover:not(:disabled) {
-      background: #a52a2a;
-    }
+.music-controls {
+  margin:0 auto 22px;
+  padding:14px;
+  border:1px solid #ffffff25;
+  border-radius:8px;
+  background:#0004;
+  max-width:420px;
+  font:12px 'Segoe UI',sans-serif;
+}
 
-    .music-controls {
-      margin: 0 auto 22px;
-      padding: 14px;
-      border: 1px solid #ffffff25;
-      border-radius: 8px;
-      background: #0004;
-      max-width: 420px;
-      font: 12px 'Segoe UI',sans-serif;
-    }
+.music-controls button {
+  padding:9px 16px;
+  font-size:11px;
+  margin-bottom:10px;
+}
 
-    .music-controls button {
-      padding: 9px 16px;
-      font-size: 11px;
-      margin-bottom: 10px;
-    }
+.volume-row {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  color:#c4cbd5;
+}
 
-    .volume-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      color: #c4cbd5;
-    }
+.volume-row input {
+  width:130px;
+  accent-color:var(--gold);
+}
 
-    .volume-row input {
-      width: 130px;
-      accent-color: var(--gold);
-    }
+#message {
+  min-height:22px;
+  margin-top:15px;
+  font:12px 'Segoe UI',sans-serif;
+  color:#c4cbd5;
+}
 
-    #message {
-      min-height: 22px;
-      margin-top: 15px;
-      font: 12px 'Segoe UI',sans-serif;
-      color: #c4cbd5;
-    }
+.stats {
+  display:flex;
+  justify-content:center;
+  gap:34px;
+  flex-wrap:wrap;
+  margin:24px 0 8px;
+}
 
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 34px;
-      flex-wrap: wrap;
-      margin: 24px 0 8px;
-    }
+.stat strong {
+  display:block;
+  color:var(--gold-light);
+  font-size:27px;
+}
 
-    .stat strong {
-      display: block;
-      color: var(--gold-light);
-      font-size: 27px;
-    }
+.stat span {
+  font:10px 'Segoe UI',sans-serif;
+  color:#8a94a6;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
 
-    .stat span {
-      font: 10px 'Segoe UI',sans-serif;
-      color: #8a94a6;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
+.history {
+  margin-top:28px;
+  text-align:left;
+}
 
-    .history {
-      margin-top: 28px;
-      text-align: left;
-    }
+.history h2 {
+  font-size:16px;
+  font-weight:400;
+  letter-spacing:3px;
+  color:var(--gold-light);
+  text-align:center;
+  text-transform:uppercase;
+}
 
-    .history h2 {
-      font-size: 16px;
-      font-weight: 400;
-      letter-spacing: 3px;
-      color: var(--gold-light);
-      text-align: center;
-      text-transform: uppercase;
-    }
+.table-wrap {
+  overflow-x:auto;
+  border:1px solid #ffffff20;
+  border-radius:8px;
+}
 
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid #ffffff20;
-      border-radius: 8px;
-    }
+table {
+  width:100%;
+  border-collapse:collapse;
+  font:13px 'Segoe UI',sans-serif;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font: 13px 'Segoe UI',sans-serif;
-    }
+th,td {
+  padding:11px 13px;
+  border-bottom:1px solid #ffffff16;
+  text-align:left;
+}
 
-    th, td {
-      padding: 11px 13px;
-      border-bottom: 1px solid #ffffff16;
-      text-align: left;
-    }
+th {
+  color:var(--gold);
+  font-size:10px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  background:#ffffff08;
+}
 
-    th {
-      color: var(--gold);
-      font-size: 10px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      background: #ffffff08;
-    }
+td:first-child {
+  color:var(--gold-light);
+  font-weight:700;
+}
 
-    td:first-child {
-      color: var(--gold-light);
-      font-weight: 700;
-    }
+tbody tr:last-child td { border-bottom:0; }
 
-    tbody tr:last-child td { border-bottom: 0; }
+.empty {
+  text-align:center;
+  color:#8a94a6;
+  padding:18px;
+}
 
-    .empty {
-      text-align: center;
-      color: #8a94a6;
-      padding: 18px;
-    }
+.note {
+  margin-top:22px;
+  color:#788292;
+  font:10px 'Segoe UI',sans-serif;
+  line-height:1.6;
+}
 
-    .note {
-      margin-top: 22px;
-      color: #788292;
-      font: 10px 'Segoe UI',sans-serif;
-      line-height: 1.6;
-    }
+@keyframes reveal {
+  0% { transform:scale(.75);opacity:.2; }
+  70% { transform:scale(1.08); }
+  100% { transform:scale(1);opacity:1; }
+}
 
-    @keyframes reveal {
-      0% { transform: scale(.75); opacity: .2; }
-      70% { transform: scale(1.08); }
-      100% { transform: scale(1); opacity: 1; }
-    }
+.reveal { animation:reveal .65s ease-out; }
 
-    .reveal { animation: reveal .65s ease-out; }
+@media(max-width:520px) {
+  .secondary {
+    margin:10px 0 0;
+  }
 
-    @media(max-width:520px) {
-      .secondary {
-        margin: 10px 0 0;
-      }
+  .stop-award-button {
+    margin:10px 0 0;
+  }
 
-      .stop-award-button {
-        margin: 10px 0 0;
-      }
+  .panel {
+    padding:18px 12px;
+  }
 
-      .panel {
-        padding: 18px 12px;
-      }
-
-      .stats {
-        gap: 20px;
-      }
-    }
-  </style>
+  .stats {
+    gap:20px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- BACKGROUND SLIDESHOW -->
-  <div id="slide1" class="bg-slide active"></div>
-  <div id="slide2" class="bg-slide"></div>
-  <div class="bg-overlay"></div>
+<div id="slide1" class="bg-slide active"></div>
+<div id="slide2" class="bg-slide"></div>
+<div class="bg-overlay"></div>
 
-  <main class="wrap">
+<main class="wrap">
 
-    <h1>HTM Annual Dinner 2026</h1>
-    <div class="subtitle">Lucky Draw Celebration</div>
+<h1>HTM Annual Dinner 2026</h1>
+<div class="subtitle">Lucky Draw Celebration</div>
 
-    <section class="panel">
+<section class="panel">
 
-      <!-- BACKGROUND MUSIC CONTROL -->
-      <div class="music-controls">
+  <!-- BACKGROUND MUSIC -->
 
-        <div style="color:#f3e5ab;margin-bottom:10px;letter-spacing:2px;">
-          ♪ EVENT BACKGROUND MUSIC
-        </div>
+  <div class="music-controls">
 
-        <button
-          id="musicButton"
-          type="button"
-          onclick="toggleBackgroundMusic()">
-          ▶ PLAY BACKGROUND MUSIC
-        </button>
+    <div style="color:#f3e5ab;margin-bottom:10px;letter-spacing:2px;">
+      ♪ EVENT BACKGROUND MUSIC
+    </div>
 
-        <div class="volume-row">
-          <span>VOLUME</span>
+    <button id="musicButton"
+      type="button"
+      onclick="toggleBackgroundMusic()">
+      ▶ PLAY BACKGROUND MUSIC
+    </button>
 
-          <input
-            type="range"
-            id="musicVolume"
-            min="0"
-            max="100"
-            value="25"
-            oninput="changeBackgroundVolume(this.value)">
+    <div class="volume-row">
+      <span>VOLUME</span>
 
-          <span id="volumeValue">25%</span>
-        </div>
+      <input type="range"
+        id="musicVolume"
+        min="0"
+        max="100"
+        value="25"
+        oninput="changeBackgroundVolume(this.value)">
 
-      </div>
+      <span id="volumeValue">25%</span>
+    </div>
 
-      <div class="eyebrow">And the lucky winner is...</div>
+  </div>
 
-      <div class="winner-box" aria-live="polite">
+  <div class="eyebrow">And the lucky winner is...</div>
 
-        <div id="winnerNumber">READY</div>
+  <div class="winner-box" aria-live="polite">
+    <div id="winnerNumber">READY</div>
+    <div id="winnerName">Good luck everyone!</div>
+    <div id="winnerMeta"></div>
+  </div>
 
-        <div id="winnerName">Good luck everyone!</div>
+  <!-- DRAW BUTTON -->
 
-        <div id="winnerMeta"></div>
+  <button id="drawButton"
+    type="button"
+    onclick="startLuckyDraw()">
+    🎁 START LUCKY DRAW
+  </button>
 
-      </div>
+  <!-- STOP AWARD MUSIC -->
 
-      <!-- START LUCKY DRAW -->
-      <button
-        id="drawButton"
-        type="button"
-        onclick="startLuckyDraw()">
-        🎁 START LUCKY DRAW
-      </button>
+  <button id="stopAwardButton"
+    class="stop-award-button"
+    type="button"
+    onclick="stopAwardMusic()">
+    ■ STOP AWARD MUSIC
+  </button>
 
-      <!-- STOP AWARD MUSIC -->
-      <button
-        id="stopAwardButton"
-        class="stop-award-button"
-        type="button"
-        onclick="stopAwardMusic()">
-        ■ STOP AWARD MUSIC
-      </button>
+  <button id="historyButton"
+    class="secondary"
+    type="button"
+    onclick="loadHistory()">
+    REFRESH WINNER HISTORY
+  </button>
 
-      <!-- REFRESH HISTORY -->
-      <button
-        id="historyButton"
-        class="secondary"
-        type="button"
-        onclick="loadHistory()">
-        REFRESH WINNER HISTORY
-      </button>
+  <div id="message" role="status">
+    Ready to draw one winner.
+  </div>
 
-      <div id="message" role="status">
-        Ready to draw one winner.
-      </div>
+  <div class="stats">
 
-      <div class="stats">
+    <div class="stat">
+      <strong id="remainingCount">—</strong>
+      <span>Numbers remaining</span>
+    </div>
 
-        <div class="stat">
-          <strong id="remainingCount">—</strong>
-          <span>Numbers remaining</span>
-        </div>
+    <div class="stat">
+      <strong id="winnerCount">—</strong>
+      <span>Winners drawn</span>
+    </div>
 
-        <div class="stat">
-          <strong id="winnerCount">—</strong>
-          <span>Winners drawn</span>
-        </div>
+  </div>
 
-      </div>
+  <!-- WINNER HISTORY -->
 
-      <!-- WINNER HISTORY -->
-      <div class="history">
+  <div class="history">
 
-        <h2>Winner History</h2>
+    <h2>Winner History</h2>
 
-        <div class="table-wrap">
+    <div class="table-wrap">
 
-          <table>
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Lucky Draw No.</th>
+            <th>Winner</th>
+            <th>Guest ID</th>
+            <th>Drawn At</th>
+          </tr>
+        </thead>
 
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>Lucky Draw No.</th>
-                <th>Winner</th>
-                <th>Guest ID</th>
-                <th>Drawn At</th>
-              </tr>
-            </thead>
+        <tbody id="historyBody">
+          <tr>
+            <td colspan="5" class="empty">
+              Loading winner history...
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-            <tbody id="historyBody">
+    </div>
+  </div>
 
-              <tr>
-                <td colspan="5" class="empty">
-                  Loading winner history...
-                </td>
-              </tr>
+  <div class="note">
+    Each lucky draw number can win only once.
+    Results are recorded in the Google Sheets Attendance tab.
+  </div>
 
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-      <div class="note">
-        Each lucky draw number can win only once.
-        Results are recorded in the Google Sheets Attendance tab.
-      </div>
-
-    </section>
-
-  </main>
+</section>
+</main>
 
 <script>
 
 /****************************************************
  * GOOGLE APPS SCRIPT URL
- * KEEP THIS URL THE SAME AS YOUR CHECK-IN SYSTEM
  ****************************************************/
 
 var GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
+"https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
 
 
 /****************************************************
@@ -558,7 +539,7 @@ async function toggleBackgroundMusic() {
       document.getElementById("message").textContent =
         "Music could not play. Please check Intro.mp3.";
 
-      console.log("Background music error:", error);
+      console.log(error);
     }
 
   } else {
@@ -596,7 +577,7 @@ async function resumeBackgroundMusic() {
     try {
       await backgroundAudio.play();
     } catch (error) {
-      console.log("Could not resume background music:", error);
+      console.log(error);
     }
   }
 }
@@ -617,18 +598,13 @@ function startDrumRoll() {
 
   drumRollAudio.currentTime = 0;
 
-  var playPromise = drumRollAudio.play();
+  drumRollAudio.play().catch(function(error) {
 
-  if (playPromise !== undefined) {
+    console.log("Drum roll error:", error);
 
-    playPromise.catch(function(error) {
-
-      console.log("Drum roll could not play:", error);
-
-      document.getElementById("message").textContent =
-        "Drum roll could not play. Please check DrumRoll.mp3.";
-    });
-  }
+    document.getElementById("message").textContent =
+      "Drum roll could not play. Please check DrumRoll.mp3.";
+  });
 }
 
 function stopDrumRoll() {
@@ -654,16 +630,9 @@ function playAwardMusic() {
   awardAudio.currentTime = 0;
 
   awardAudio.play().catch(function(error) {
-
-    console.log("Award music could not play:", error);
-
+    console.log("Award music error:", error);
   });
 }
-
-
-/****************************************************
- * HOST CONTROL: STOP AWARD MUSIC
- ****************************************************/
 
 function stopAwardMusic() {
 
@@ -672,6 +641,122 @@ function stopAwardMusic() {
 
   document.getElementById("message").textContent =
     "Award celebration music stopped by host.";
+}
+
+
+/****************************************************
+ * EXCITEMENT VOICE ANNOUNCER
+ ****************************************************/
+
+var speechSupported =
+  "speechSynthesis" in window &&
+  "SpeechSynthesisUtterance" in window;
+
+var announcerVoice = null;
+
+function selectAnnouncerVoice() {
+
+  if (!speechSupported) return;
+
+  var voices = window.speechSynthesis.getVoices();
+
+  // Prefer an English voice.
+  announcerVoice =
+    voices.find(function(v) {
+      return v.lang === "en-US";
+    }) ||
+    voices.find(function(v) {
+      return v.lang === "en-GB";
+    }) ||
+    voices.find(function(v) {
+      return v.lang &&
+        v.lang.toLowerCase().startsWith("en");
+    }) ||
+    null;
+}
+
+// Some browsers load voices asynchronously.
+if (speechSupported) {
+
+  selectAnnouncerVoice();
+
+  window.speechSynthesis.onvoiceschanged =
+    selectAnnouncerVoice;
+}
+
+
+function announceWinner(number, winnerName) {
+
+  return new Promise(function(resolve) {
+
+    if (!speechSupported) {
+
+      console.log("Speech synthesis is not supported.");
+      resolve();
+      return;
+    }
+
+    // Stop any previous announcement.
+    window.speechSynthesis.cancel();
+
+    // Speak each digit separately.
+    var digits = String(number)
+      .split("")
+      .filter(function(d) {
+        return /^[0-9]$/.test(d);
+      })
+      .join(", ");
+
+    var announcement =
+      "Ladies and gentlemen! " +
+      "We have a lucky winner! " +
+      "The winning number is... " +
+      digits + "! " +
+      "Congratulations to " +
+      String(winnerName || "our lucky winner") +
+      "! What a wonderful moment!";
+
+    var speech = new SpeechSynthesisUtterance(
+      announcement
+    );
+
+    // Excited event announcer settings.
+    speech.rate = 0.95;
+    speech.pitch = 1.25;
+    speech.volume = 1;
+
+    if (announcerVoice) {
+      speech.voice = announcerVoice;
+    }
+
+    speech.onend = function() {
+      resolve();
+    };
+
+    speech.onerror = function(error) {
+      console.log("Voice announcement error:", error);
+      resolve();
+    };
+
+    // Fallback in case the browser does not finish speaking.
+    var finished = false;
+
+    function finishAnnouncement() {
+      if (!finished) {
+        finished = true;
+        resolve();
+      }
+    }
+
+    speech.onend = finishAnnouncement;
+    speech.onerror = finishAnnouncement;
+
+    window.speechSynthesis.speak(speech);
+
+    // Safety timeout.
+    setTimeout(finishAnnouncement, 45000);
+
+  });
 }
 
 
@@ -776,10 +861,15 @@ async function startLuckyDraw() {
   message.textContent =
     "Please wait. The lucky draw is in progress...";
 
+  // Stop any previous voice announcement.
+  if (speechSupported) {
+    window.speechSynthesis.cancel();
+  }
+
   // Stop background music.
   pauseBackgroundMusic();
 
-  // Stop any previous award music.
+  // Stop previous award music.
   awardAudio.pause();
   awardAudio.currentTime = 0;
 
@@ -803,7 +893,6 @@ async function startLuckyDraw() {
 
     var response = results[0];
 
-    // Stop drum roll.
     stopDrumRoll();
 
     var p = String(response).split("|");
@@ -827,12 +916,19 @@ async function startLuckyDraw() {
         p[4];
 
       message.textContent =
+        "CONGRATULATIONS! Announcing our lucky winner...";
+
+      // Update winner history.
+      await loadHistory(false);
+
+      // Announce the number and winner's name.
+      await announceWinner(p[1], p[2]);
+
+      // Start celebration music after voice announcement.
+      message.textContent =
         "CONGRATULATIONS! We have a winner!";
 
-      // Play award celebration music.
       playAwardMusic();
-
-      await loadHistory(false);
 
     } else if (p[0] === "EMPTY") {
 
@@ -860,7 +956,7 @@ async function startLuckyDraw() {
 
     message.textContent = "Error: " + err.message;
 
-    name.textContent = "No winner was displayed.";
+    name.textContent = "Please check the connection.";
 
   } finally {
 
@@ -908,8 +1004,7 @@ async function loadHistory(showMessage) {
 
     var items = payload.winners || [];
 
-    var body =
-      document.getElementById("historyBody");
+    var body = document.getElementById("historyBody");
 
     document.getElementById("winnerCount").textContent =
       items.length;
