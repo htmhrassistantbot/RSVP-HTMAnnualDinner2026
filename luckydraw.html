@@ -575,6 +575,24 @@
     drumRollAudio.pause();
     drumRollAudio.currentTime = 0;
   }
+  /****************************************************
+ * AWARD CELEBRATION MUSIC
+ ****************************************************/
+
+var awardAudio = new Audio(
+  "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Award.mp3"
+);
+
+awardAudio.loop = false;
+awardAudio.volume = 0.85;
+
+function playAwardMusic() {
+  awardAudio.currentTime = 0;
+
+  awardAudio.play().catch(function(error) {
+    console.log("Award music could not play:", error);
+  });
+}
 
 
   /****************************************************
@@ -654,136 +672,122 @@
    * START LUCKY DRAW
    ****************************************************/
 
-  async function startLuckyDraw() {
+ async function startLuckyDraw() {
 
-    var button = document.getElementById("drawButton");
+  var button = document.getElementById("drawButton");
+  var historyButton = document.getElementById("historyButton");
 
-    var historyButton =
-      document.getElementById("historyButton");
+  var number = document.getElementById("winnerNumber");
+  var name = document.getElementById("winnerName");
+  var meta = document.getElementById("winnerMeta");
+  var message = document.getElementById("message");
 
-    var number =
-      document.getElementById("winnerNumber");
+  if (button.disabled) return;
 
-    var name =
-      document.getElementById("winnerName");
+  button.disabled = true;
+  historyButton.disabled = true;
 
-    var meta =
-      document.getElementById("winnerMeta");
+  button.textContent = "DRAWING...";
 
-    var message =
-      document.getElementById("message");
+  number.textContent = "✦";
+  name.textContent = "Selecting one eligible number...";
+  meta.textContent = "";
 
-    if (button.disabled) return;
+  message.textContent =
+    "Please wait. The lucky draw is in progress...";
 
-    button.disabled = true;
-    historyButton.disabled = true;
+  // Stop background music.
+  pauseBackgroundMusic();
 
-    button.textContent = "DRAWING...";
+  // Stop any previous award music.
+  awardAudio.pause();
+  awardAudio.currentTime = 0;
 
-    number.textContent = "✦";
-    name.textContent = "Selecting one eligible number...";
-    meta.textContent = "";
+  // Start drum roll.
+  startDrumRoll();
 
-    message.textContent =
-      "Please wait. The lucky draw is in progress...";
+  var winnerSelected = false;
 
-    // Pause background music while drum roll plays.
-    pauseBackgroundMusic();
+  try {
 
-    // Start drum roll immediately after the button click.
-    startDrumRoll();
+    // Drum roll plays for at least 4 seconds.
+    var results = await Promise.all([
+      jsonp("draw"),
+      new Promise(function(resolve) {
+        setTimeout(resolve, 4000);
+      })
+    ]);
 
-    try {
+    var response = results[0];
 
-      // Keep drum roll playing for at least 4 seconds.
-      var results = await Promise.all([
+    // Stop drum roll.
+    stopDrumRoll();
 
-        jsonp("draw"),
+    var p = String(response).split("|");
 
-        new Promise(function(resolve) {
-          setTimeout(resolve, 4000);
-        })
+    if (p[0] === "DRAWN") {
 
-      ]);
+      winnerSelected = true;
 
-      var response = results[0];
+      number.textContent = p[1];
 
-      // Stop drum roll before revealing winner.
-      stopDrumRoll();
+      number.classList.remove("reveal");
+      void number.offsetWidth;
+      number.classList.add("reveal");
 
-      var p = String(response).split("|");
+      name.textContent = p[2] || "Winner";
+      meta.textContent = "Guest ID: " + (p[3] || "-");
 
-      if (p[0] === "DRAWN") {
-
-        number.textContent = p[1];
-
-        number.classList.remove("reveal");
-
-        void number.offsetWidth;
-
-        number.classList.add("reveal");
-
-        name.textContent = p[2] || "Winner";
-
-        meta.textContent =
-          "Guest ID: " + (p[3] || "-");
-
-        document.getElementById("remainingCount").textContent =
-          p[4];
-
-        message.textContent =
-          "Winner successfully recorded in Google Sheets.";
-
-        await loadHistory(false);
-
-      } else if (p[0] === "EMPTY") {
-
-        number.textContent = "FINISHED";
-
-        name.textContent =
-          "All eligible numbers have been drawn.";
-
-        meta.textContent = "";
-
-        message.textContent =
-          "No numbers remain.";
-
-        document.getElementById("remainingCount").textContent =
-          "0";
-
-      } else {
-
-        throw new Error(
-          p.slice(1).join("|") ||
-          "Unknown response from server."
-        );
-      }
-
-    } catch (err) {
-
-      stopDrumRoll();
+      document.getElementById("remainingCount").textContent =
+        p[4];
 
       message.textContent =
-        "Error: " + err.message;
+        "CONGRATULATIONS! We have a winner!";
 
-      name.textContent =
-        "No winner was displayed.";
+      // Play award celebration music.
+      playAwardMusic();
 
-    } finally {
+      await loadHistory(false);
 
-      stopDrumRoll();
+    } else if (p[0] === "EMPTY") {
 
-      button.disabled = false;
-      historyButton.disabled = false;
+      number.textContent = "FINISHED";
+      name.textContent = "All eligible numbers have been drawn.";
+      meta.textContent = "";
 
-      button.textContent =
-        "🎁 DRAW NEXT WINNER";
+      message.textContent = "No numbers remain.";
 
-      // Resume background music if it was enabled before.
+      document.getElementById("remainingCount").textContent = "0";
+
+    } else {
+
+      throw new Error(
+        p.slice(1).join("|") || "Unknown response from server."
+      );
+    }
+
+  } catch (err) {
+
+    stopDrumRoll();
+
+    message.textContent = "Error: " + err.message;
+    name.textContent = "No winner was displayed.";
+
+  } finally {
+
+    stopDrumRoll();
+
+    button.disabled = false;
+    historyButton.disabled = false;
+
+    button.textContent = "🎁 DRAW NEXT WINNER";
+
+    // Keep background music paused after a winner is selected.
+    if (!winnerSelected) {
       resumeBackgroundMusic();
     }
   }
-
+}
 
   /****************************************************
    * LOAD WINNER HISTORY
