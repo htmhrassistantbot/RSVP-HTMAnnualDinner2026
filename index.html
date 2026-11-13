@@ -315,6 +315,12 @@
 
     var html5QrcodeScanner;
     var isProcessing = false;
+    // AUTO FOCUS & AUTO ZOOM
+    var autoZoomTimer = null;
+    var autoZoomBusy = false;
+    var currentZoom = 1;
+    var lastZoomTime = 0;
+    var qrDetector = null;
     
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
 
@@ -431,9 +437,12 @@
       };
     }
 
-    function onScanSuccess(decodedText, decodedResult) {
+      function onScanSuccess(decodedText, decodedResult) {
       if (isProcessing) return;
       isProcessing = true;
+  
+      // Stop automatic zoom after successful QR detection
+      stopAutoZoom();
       
       var resultDiv = document.getElementById('result');
       resultDiv.classList.remove('animate-entrance');
@@ -525,12 +534,138 @@
     }
   }
 }
-    function initScanner() {
+    
+function stopAutoZoom() {
+  if (autoZoomTimer) {
+    clearInterval(autoZoomTimer);
+    autoZoomTimer = null;
+  }
+  autoZoomBusy = false;
+}
+
+function startAutoFocusAndZoom() {
+  stopAutoZoom();
+
+  if (!("BarcodeDetector" in window)) {
+    console.log("Automatic QR detection is not supported by this browser.");
+    return;
+  }
+
+  try {
+    qrDetector = new BarcodeDetector({
+      formats: ["qr_code"]
+    });
+  } catch (error) {
+    console.log("QR detector unavailable:", error);
+    return;
+  }
+
+  autoZoomTimer = setInterval(async function() {
+    if (autoZoomBusy || isProcessing) return;
+
+    var video = document.querySelector("#reader video");
+
+    if (!video || !video.srcObject || !video.videoWidth) return;
+
+    var track = video.srcObject.getVideoTracks()[0];
+
+    if (!track) return;
+
+    autoZoomBusy = true;
+
+    try {
+      var capabilities = track.getCapabilities();
+      var settings = track.getSettings();
+
+      // Enable continuous autofocus where supported
+      if (
+        capabilities.focusMode &&
+        capabilities.focusMode.includes("continuous") &&
+        !track.__autoFocusEnabled
+      ) {
+        await track.applyConstraints({
+          advanced: [{ focusMode: "continuous" }]
+        });
+        track.__autoFocusEnabled = true;
+      }
+
+      // Check whether hardware zoom is available
+      if (!capabilities.zoom) return;
+
+      var minZoom = capabilities.zoom.min;
+      var maxZoom = capabilities.zoom.max;
+      var zoomStep = capabilities.zoom.step || 0.1;
+
+      currentZoom = settings.zoom || minZoom;
+
+      // Detect QR code position and size
+      var detectedCodes = await qrDetector.detect(video);
+
+      if (!detectedCodes || detectedCodes.length === 0) return;
+
+      // Select the largest detected QR code
+      var qr = detectedCodes.reduce(function(previous, current) {
+        var previousArea =
+          previous.boundingBox.width * previous.boundingBox.height;
+        var currentArea =
+          current.boundingBox.width * current.boundingBox.height;
+
+        return currentArea > previousArea ? current : previous;
+      });
+
+      var qrWidth = qr.boundingBox.width;
+      var videoWidth = video.videoWidth;
+
+      // Desired QR size: approximately 38% of video width
+      var targetWidth = videoWidth * 0.38;
+
+      var newZoom = currentZoom;
+
+      if (qrWidth < targetWidth * 0.75) {
+        // QR code is small: zoom in gradually
+        newZoom = Math.min(
+          maxZoom,
+          currentZoom + Math.max(zoomStep, 0.2)
+        );
+      } else if (qrWidth > targetWidth * 1.35) {
+        // QR code is too large: zoom out slightly
+        newZoom = Math.max(
+          minZoom,
+          currentZoom - Math.max(zoomStep, 0.2)
+        );
+      }
+
+      // Avoid unnecessary camera adjustments
+      if (
+        Math.abs(newZoom - currentZoom) >= zoomStep / 2 &&
+        Date.now() - lastZoomTime > 700
+      ) {
+        lastZoomTime = Date.now();
+
+        await track.applyConstraints({
+          advanced: [{ zoom: newZoom }]
+        });
+      }
+
+    } catch (error) {
+      console.log("Auto-focus/zoom adjustment:", error);
+    } finally {
+      autoZoomBusy = false;
+    }
+
+  }, 500);
+}
+
+
+function initScanner() {
+  stopAutoZoom();
+
   html5QrcodeScanner = new Html5QrcodeScanner("reader", {
     fps: 15,
     qrbox: { width: 250, height: 250 },
     rememberLastUsedCamera: true,
-    aspectRatio: 1.0
+    aspectRatio: 1.0,
+    showZoomSliderIfSupported: true
   }, false);
 
   html5QrcodeScanner.render(
@@ -538,17 +673,16 @@
     function(error) {}
   );
 
-  // Check camera direction after camera starts
   var cameraCheck = setInterval(function() {
     var video = document.querySelector("#reader video");
 
     if (video && video.srcObject) {
       setCameraDisplayDirection();
+      startAutoFocusAndZoom();
       clearInterval(cameraCheck);
     }
   }, 300);
 }
-
     function resetScanner(delay) {
       setTimeout(function() {
         isProcessing = false;
