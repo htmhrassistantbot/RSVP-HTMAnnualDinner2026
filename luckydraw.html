@@ -200,9 +200,10 @@ async function playDrumRollAndAnimate(numberEl) {
   drumRollAudio.pause();
   drumRollAudio.currentTime = 0;
 
-  var audioStarted = false;
-  var animationFrame = null;
   var finished = false;
+  var animationFrame = null;
+
+  numberEl.classList.add("rolling");
 
   function finishRoll(resolve) {
     if (finished) return;
@@ -211,40 +212,59 @@ async function playDrumRollAndAnimate(numberEl) {
 
     if (animationFrame !== null) {
       cancelAnimationFrame(animationFrame);
+      animationFrame = null;
     }
 
-    drumRollAudio.removeEventListener("ended", onAudioEnded);
+    // Stop the rolling effect immediately.
+    numberEl.classList.remove("rolling");
 
-    drumRollAudio.pause();
+    drumRollAudio.removeEventListener("ended", onAudioEnded);
+    drumRollAudio.removeEventListener("pause", onAudioPaused);
+    drumRollAudio.removeEventListener("error", onAudioEnded);
 
     resolve();
   }
 
-  var resolveRoll;
-
   function onAudioEnded() {
-    if (resolveRoll) {
+    if (resolveRoll) finishRoll(resolveRoll);
+  }
+
+  function onAudioPaused() {
+    if (resolveRoll && drumRollAudio.paused) {
       finishRoll(resolveRoll);
     }
   }
 
-  if (soundEnabled) {
-    try {
-      await drumRollAudio.play();
-      audioStarted = true;
-    } catch (e) {
-      console.log("Drum roll could not play:", e);
-    }
+  var resolveRoll;
+
+  if (!soundEnabled) {
+    numberEl.classList.remove("rolling");
+    return;
   }
 
-  if (!audioStarted) {
-    var fallbackDuration = await getDrumRollDuration();
-    var startTime = performance.now();
+  return new Promise(function(resolve) {
 
-    await new Promise(function(resolve) {
+    resolveRoll = resolve;
 
-      function animateWithoutAudio(timestamp) {
-        if (timestamp - startTime >= fallbackDuration * 1000) {
+    drumRollAudio.addEventListener("ended", onAudioEnded);
+    drumRollAudio.addEventListener("pause", onAudioPaused);
+    drumRollAudio.addEventListener("error", onAudioEnded);
+
+    drumRollAudio.play().then(function() {
+
+      function animate(timestamp) {
+
+        if (finished) return;
+
+        if (
+          drumRollAudio.ended ||
+          drumRollAudio.paused ||
+          (
+            Number.isFinite(drumRollAudio.duration) &&
+            drumRollAudio.duration > 0 &&
+            drumRollAudio.currentTime >= drumRollAudio.duration - 0.03
+          )
+        ) {
           finishRoll(resolve);
           return;
         }
@@ -252,57 +272,18 @@ async function playDrumRollAndAnimate(numberEl) {
         numberEl.textContent =
           String(Math.floor(Math.random() * 900) + 100);
 
-        animationFrame = requestAnimationFrame(animateWithoutAudio);
+        animationFrame = requestAnimationFrame(animate);
       }
 
-      animationFrame = requestAnimationFrame(animateWithoutAudio);
+      animationFrame = requestAnimationFrame(animate);
+
+    }).catch(function(error) {
+      console.log("Drum roll playback error:", error);
+      finishRoll(resolve);
     });
 
-    return;
-  }
-
-  await new Promise(function(resolve) {
-
-    resolveRoll = resolve;
-
-    drumRollAudio.addEventListener(
-      "ended",
-      onAudioEnded,
-      { once: true }
-    );
-
-    function animateWithAudio(timestamp) {
-
-      if (finished) return;
-
-      // Stop immediately when the MP3 reaches its end.
-      if (
-        drumRollAudio.ended ||
-        (
-          Number.isFinite(drumRollAudio.duration) &&
-          drumRollAudio.duration > 0 &&
-          drumRollAudio.currentTime >= drumRollAudio.duration - 0.03
-        )
-      ) {
-        finishRoll(resolve);
-        return;
-      }
-
-      // Change the number only while the MP3 is playing.
-      if (!drumRollAudio.paused) {
-        numberEl.textContent =
-          String(Math.floor(Math.random() * 900) + 100);
-      }
-
-      animationFrame = requestAnimationFrame(animateWithAudio);
-    }
-
-    animationFrame = requestAnimationFrame(animateWithAudio);
-
   });
-
 }
-
   
 async function runLuckyDraw() {
   var numberEl = document.getElementById("winnerNumber");
