@@ -194,79 +194,189 @@ async function getDrumRollDuration(){
     ready();
   });
 }
+async function playDrumRollAndAnimate(numberEl) {
+  var duration = await getDrumRollDuration();
 
-async function runLuckyDraw(){
-  var numberEl=document.getElementById("winnerNumber");
-  var nameEl=document.getElementById("winnerName");
-  var metaEl=document.getElementById("winnerMeta");
-  var messageEl=document.getElementById("message");
-  pauseBackgroundMusic();stopAwardMusic();
-  if("speechSynthesis" in window)window.speechSynthesis.cancel();
+  drumRollAudio.pause();
+  drumRollAudio.currentTime = 0;
 
-  messageEl.textContent="The host has started the lucky draw. Good luck!";
-  numberEl.classList.add("rolling");
-  nameEl.textContent="Selecting the lucky number...";
-  metaEl.textContent="";
+  var finished = false;
+  var lastChange = 0;
+  var animationFrame = null;
+  var finishPromise;
+  var finishResolve;
 
-  // Start the drum roll and keep changing numbers until its real duration ends.
-  var drumDuration=await getDrumRollDuration();
-  drumRollAudio.currentTime=0;
-  var drumStarted=false;
-  if(soundEnabled){
-    try{
+  finishPromise = new Promise(function(resolve) {
+    finishResolve = resolve;
+  });
+
+  function finishRoll() {
+    if (finished) return;
+    finished = true;
+    finishResolve();
+  }
+
+  function updateNumber(timestamp) {
+    if (finished) return;
+
+    if (timestamp - lastChange >= 70) {
+      numberEl.textContent =
+        String(Math.floor(Math.random() * 900) + 100);
+
+      lastChange = timestamp;
+    }
+
+    animationFrame = requestAnimationFrame(updateNumber);
+  }
+
+  drumRollAudio.addEventListener("ended", finishRoll, { once: true });
+
+  var audioStarted = false;
+
+  if (soundEnabled) {
+    try {
       await drumRollAudio.play();
-      drumStarted=true;
-    }catch(e){
-      console.log("Drum roll could not play:",e);
+      audioStarted = true;
+    } catch (e) {
+      console.log("Drum roll could not play:", e);
     }
   }
 
-  var start=Date.now();
-  var durationMs=Math.max(1000,drumDuration*1000);
-  while(Date.now()-start<durationMs){
-    numberEl.textContent=String(Math.floor(Math.random()*900)+100);
-    await sleep(80);
+  animationFrame = requestAnimationFrame(updateNumber);
+
+  if (audioStarted) {
+    // Wait for the actual MP3 to finish.
+    await Promise.race([
+      finishPromise,
+      sleep((duration + 2) * 1000)
+    ]);
+  } else {
+    // Fallback when audio is unavailable.
+    await sleep(duration * 1000);
   }
 
-  // Stop the sound exactly when the rolling sequence finishes.
-  if(drumStarted)stopDrumRoll();
+  finished = true;
 
-  try{
-    var response=await api("draw");
-    stopDrumRoll();
+  if (animationFrame !== null) {
+    cancelAnimationFrame(animationFrame);
+  }
+
+  drumRollAudio.removeEventListener("ended", finishRoll);
+
+  if (audioStarted) {
+    drumRollAudio.pause();
+    drumRollAudio.currentTime = 0;
+  }
+}
+  
+async function runLuckyDraw() {
+  var numberEl = document.getElementById("winnerNumber");
+  var nameEl = document.getElementById("winnerName");
+  var metaEl = document.getElementById("winnerMeta");
+  var messageEl = document.getElementById("message");
+
+  pauseBackgroundMusic();
+  stopAwardMusic();
+
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  messageEl.textContent = "The host has started the lucky draw. Good luck!";
+
+  numberEl.classList.add("rolling");
+  nameEl.textContent = "Selecting the lucky number...";
+  metaEl.textContent = "";
+
+  try {
+    // IMPORTANT: Request the winner immediately,
+    // while the drum roll and animation are running.
+    var drawRequest = api("draw");
+
+    // Run animation and drum roll together.
+    await playDrumRollAndAnimate(numberEl);
+
+    // The winner should already be ready from Google Sheets.
+    var response = await drawRequest;
+
     numberEl.classList.remove("rolling");
 
-    var parts=String(response).split("|");
-    if(parts[0]==="DRAWN"){
-      var result={number:parts[1]||"",name:parts[2]||"Winner",guestId:parts[3]||"-",remaining:parts[4]||"0"};
-      numberEl.textContent=result.number;
-      numberEl.classList.remove("reveal");void numberEl.offsetWidth;numberEl.classList.add("reveal");
-      nameEl.textContent=result.name;
-      metaEl.textContent="Guest ID: "+result.guestId;
-      document.getElementById("remainingCount").textContent=result.remaining;
-      messageEl.textContent="CONGRATULATIONS! Announcing the lucky number...";
+    var parts = String(response).split("|");
+
+    if (parts[0] === "DRAWN") {
+
+      var result = {
+        number: parts[1] || "",
+        name: parts[2] || "Winner",
+        guestId: parts[3] || "-",
+        remaining: parts[4] || "0"
+      };
+
+      numberEl.textContent = result.number;
+
+      numberEl.classList.remove("reveal");
+      void numberEl.offsetWidth;
+      numberEl.classList.add("reveal");
+
+      nameEl.textContent = result.name;
+      metaEl.textContent = "Guest ID: " + result.guestId;
+
+      document.getElementById("remainingCount").textContent =
+        result.remaining;
+
+      messageEl.textContent =
+        "CONGRATULATIONS! Announcing the lucky number...";
+
       await loadHistory();
       await announceNumber(result.number);
-      messageEl.textContent="CONGRATULATIONS! We have a winner!";
-      if(soundEnabled){awardAudio.currentTime=0;awardAudio.play().catch(function(){});}
-      await reportResult("complete",result);
-    }else if(parts[0]==="EMPTY"){
-      numberEl.textContent="FINISHED";nameEl.textContent="All eligible numbers have been drawn.";metaEl.textContent="";
-      messageEl.textContent="No eligible numbers remain.";
-      document.getElementById("remainingCount").textContent="0";
-      await reportResult("empty",{message:"All eligible numbers have been drawn.",remaining:"0"});
-    }else{
-      throw new Error(parts.slice(1).join("|")||"Unknown server response.");
+
+      messageEl.textContent =
+        "CONGRATULATIONS! We have a winner!";
+
+      if (soundEnabled) {
+        awardAudio.currentTime = 0;
+        awardAudio.play().catch(function() {});
+      }
+
+      await reportResult("complete", result);
+
+    } else if (parts[0] === "EMPTY") {
+
+      numberEl.textContent = "FINISHED";
+      nameEl.textContent = "All eligible numbers have been drawn.";
+      metaEl.textContent = "";
+
+      messageEl.textContent = "No eligible numbers remain.";
+
+      document.getElementById("remainingCount").textContent = "0";
+
+      await reportResult("empty", {
+        message: "All eligible numbers have been drawn.",
+        remaining: "0"
+      });
+
+    } else {
+      throw new Error(
+        parts.slice(1).join("|") || "Unknown server response."
+      );
     }
-  }catch(err){
-    stopDrumRoll();numberEl.classList.remove("rolling");
-    messageEl.textContent="Draw error: "+err.message;
-    nameEl.textContent="Please check the connection.";
-    await reportResult("error",{message:err.message});
+
+  } catch (err) {
+
+    stopDrumRoll();
+
+    numberEl.classList.remove("rolling");
+
+    messageEl.textContent = "Draw error: " + err.message;
+    nameEl.textContent = "Please check the connection.";
+
+    await reportResult("error", {
+      message: err.message
+    });
+
     await playBackgroundMusic();
   }
 }
-
 var pollBusy=false;
 var handledCommands={};
 async function pollCommands(){
