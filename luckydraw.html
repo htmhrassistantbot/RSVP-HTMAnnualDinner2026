@@ -195,6 +195,7 @@ async function getDrumRollDuration(){
   });
 }
 
+
 async function playDrumRollAndAnimate(numberEl) {
 
   drumRollAudio.pause();
@@ -205,38 +206,6 @@ async function playDrumRollAndAnimate(numberEl) {
 
   numberEl.classList.add("rolling");
 
-  function finishRoll(resolve) {
-    if (finished) return;
-
-    finished = true;
-
-    if (animationFrame !== null) {
-      cancelAnimationFrame(animationFrame);
-      animationFrame = null;
-    }
-
-    // Stop the rolling effect immediately.
-    numberEl.classList.remove("rolling");
-
-    drumRollAudio.removeEventListener("ended", onAudioEnded);
-    drumRollAudio.removeEventListener("pause", onAudioPaused);
-    drumRollAudio.removeEventListener("error", onAudioEnded);
-
-    resolve();
-  }
-
-  function onAudioEnded() {
-    if (resolveRoll) finishRoll(resolveRoll);
-  }
-
-  function onAudioPaused() {
-    if (resolveRoll && drumRollAudio.paused) {
-      finishRoll(resolveRoll);
-    }
-  }
-
-  var resolveRoll;
-
   if (!soundEnabled) {
     numberEl.classList.remove("rolling");
     return;
@@ -244,46 +213,51 @@ async function playDrumRollAndAnimate(numberEl) {
 
   return new Promise(function(resolve) {
 
-    resolveRoll = resolve;
+    function finishRoll() {
+      if (finished) return;
 
-    drumRollAudio.addEventListener("ended", onAudioEnded);
-    drumRollAudio.addEventListener("pause", onAudioPaused);
-    drumRollAudio.addEventListener("error", onAudioEnded);
+      finished = true;
 
-    drumRollAudio.play().then(function() {
-
-      function animate(timestamp) {
-
-        if (finished) return;
-
-        if (
-          drumRollAudio.ended ||
-          drumRollAudio.paused ||
-          (
-            Number.isFinite(drumRollAudio.duration) &&
-            drumRollAudio.duration > 0 &&
-            drumRollAudio.currentTime >= drumRollAudio.duration - 0.03
-          )
-        ) {
-          finishRoll(resolve);
-          return;
-        }
-
-        numberEl.textContent =
-          String(Math.floor(Math.random() * 900) + 100);
-
-        animationFrame = requestAnimationFrame(animate);
+      if (animationFrame !== null) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
       }
 
-      animationFrame = requestAnimationFrame(animate);
+      numberEl.classList.remove("rolling");
 
+      drumRollAudio.removeEventListener("ended", finishRoll);
+      drumRollAudio.pause();
+
+      resolve();
+    }
+
+    function animate() {
+
+      if (finished) return;
+
+      if (drumRollAudio.ended || drumRollAudio.paused) {
+        finishRoll();
+        return;
+      }
+
+      numberEl.textContent =
+        String(Math.floor(Math.random() * 900) + 100);
+
+      animationFrame = requestAnimationFrame(animate);
+    }
+
+    drumRollAudio.addEventListener("ended", finishRoll);
+
+    drumRollAudio.play().then(function() {
+      animationFrame = requestAnimationFrame(animate);
     }).catch(function(error) {
       console.log("Drum roll playback error:", error);
-      finishRoll(resolve);
+      finishRoll();
     });
 
   });
 }
+
   
 async function runLuckyDraw() {
   var numberEl = document.getElementById("winnerNumber");
