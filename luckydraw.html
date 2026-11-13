@@ -96,7 +96,7 @@ function initSlideshow(){
 var backgroundAudio=new Audio("https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Intro.mp3");
 backgroundAudio.loop=true;backgroundAudio.volume=.25;
 var drumRollAudio=new Audio("https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/DrumRoll.mp3");
-drumRollAudio.loop=true;drumRollAudio.volume=.85;
+drumRollAudio.loop=false;drumRollAudio.preload="auto";drumRollAudio.volume=.85;
 var awardAudio=new Audio("https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Awards.mp3");
 awardAudio.loop=false;awardAudio.volume=.85;
 var soundEnabled=false,backgroundMusicEnabled=false;
@@ -173,6 +173,28 @@ function announceNumber(number){
   });
 }
 function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
+async function getDrumRollDuration(){
+  // Use the actual MP3 duration so the rolling animation follows the drum roll.
+  if(Number.isFinite(drumRollAudio.duration) && drumRollAudio.duration>0){
+    return drumRollAudio.duration;
+  }
+  return new Promise(function(resolve){
+    var finished=false;
+    var fallback=setTimeout(function(){if(!finished){finished=true;resolve(4);}},5000);
+    function ready(){
+      if(finished)return;
+      if(Number.isFinite(drumRollAudio.duration) && drumRollAudio.duration>0){
+        finished=true;clearTimeout(fallback);
+        drumRollAudio.removeEventListener("loadedmetadata",ready);
+        resolve(drumRollAudio.duration);
+      }
+    }
+    drumRollAudio.addEventListener("loadedmetadata",ready);
+    drumRollAudio.load();
+    ready();
+  });
+}
+
 async function runLuckyDraw(){
   var numberEl=document.getElementById("winnerNumber");
   var nameEl=document.getElementById("winnerName");
@@ -185,13 +207,29 @@ async function runLuckyDraw(){
   numberEl.classList.add("rolling");
   nameEl.textContent="Selecting the lucky number...";
   metaEl.textContent="";
-  if(soundEnabled){drumRollAudio.currentTime=0;drumRollAudio.play().catch(function(){});}
+
+  // Start the drum roll and keep changing numbers until its real duration ends.
+  var drumDuration=await getDrumRollDuration();
+  drumRollAudio.currentTime=0;
+  var drumStarted=false;
+  if(soundEnabled){
+    try{
+      await drumRollAudio.play();
+      drumStarted=true;
+    }catch(e){
+      console.log("Drum roll could not play:",e);
+    }
+  }
 
   var start=Date.now();
-  while(Date.now()-start<4000){
+  var durationMs=Math.max(1000,drumDuration*1000);
+  while(Date.now()-start<durationMs){
     numberEl.textContent=String(Math.floor(Math.random()*900)+100);
-    await sleep(90);
+    await sleep(80);
   }
+
+  // Stop the sound exactly when the rolling sequence finishes.
+  if(drumStarted)stopDrumRoll();
 
   try{
     var response=await api("draw");
