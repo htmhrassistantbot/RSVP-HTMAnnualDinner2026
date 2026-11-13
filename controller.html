@@ -84,21 +84,61 @@ function setConnection(ok,text){
   document.getElementById("connectionDot").className=ok?"dot online":"dot";
   document.getElementById("connectionText").textContent=text;
 }
+
 function renderStatus(payload){
-  var status=payload.status||"ready";
-  var labels={ready:"READY",queued:"REQUEST SENT",drawing:"DRAWING...",complete:"DRAW COMPLETE",empty:"FINISHED",error:"ERROR"};
-  document.getElementById("statusText").textContent=labels[status]||status.toUpperCase();
-  if(payload.message)setMessage(payload.message);
+
+  var status = payload.status || "ready";
+
+  var labels = {
+    ready: "READY",
+    queued: "REQUEST SENT",
+    drawing: "DRAWING...",
+    complete: "DRAW COMPLETE",
+    empty: "FINISHED",
+    error: "ERROR"
+  };
+
+  document.getElementById("statusText").textContent =
+    labels[status] || status.toUpperCase();
+
+  if(payload.message){
+    setMessage(payload.message);
+  }
+
+  // Clear previous winner information first
+  document.getElementById("lastNumber").textContent = "—";
+  document.getElementById("lastName").textContent =
+    "No winner result yet";
+  document.getElementById("lastMeta").textContent = "";
+
+  // Display winner only when the server returns a result
   if(payload.lastResult){
-    var r=payload.lastResult;
-    if(r.number)document.getElementById("lastNumber").textContent=r.number;
-    if(r.name)document.getElementById("lastName").textContent=r.name;
-    var meta=[];
-    if(r.guestId)meta.push("Guest ID: "+r.guestId);
-    if(r.remaining!=="")meta.push("Remaining: "+r.remaining);
-    document.getElementById("lastMeta").textContent=meta.join(" • ");
+
+    var r = payload.lastResult;
+
+    if(r.number){
+      document.getElementById("lastNumber").textContent = r.number;
+    }
+
+    if(r.name){
+      document.getElementById("lastName").textContent = r.name;
+    }
+
+    var meta = [];
+
+    if(r.guestId){
+      meta.push("Guest ID: " + r.guestId);
+    }
+
+    if(r.remaining !== "" && r.remaining !== undefined){
+      meta.push("Remaining: " + r.remaining);
+    }
+
+    document.getElementById("lastMeta").textContent =
+      meta.join(" • ");
   }
 }
+
 async function refreshStatus(showError){
   try{
     var response=await api("remoteStatus");
