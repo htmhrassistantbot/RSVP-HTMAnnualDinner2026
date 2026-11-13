@@ -423,10 +423,19 @@ async function pollCommands(){
         await api("remoteAck",{commandId:command.id});
         if(command.type==="draw"){
           await runLuckyDraw();
-        }else if(command.type==="stopAward"){
-          stopAwardMusic();
-          document.getElementById("message").textContent="Award celebration music stopped by the host.";
-        }
+       }else if(command.type==="stopAward"){
+
+  // Stop the award celebration music
+  stopAwardMusic();
+
+  // Resume the background music
+  await playBackgroundMusic();
+
+  document.getElementById("message").textContent =
+    "Award music stopped. Background music resumed.";
+
+}
+
       }
     }
   }catch(err){console.log("Remote polling:",err.message);}
