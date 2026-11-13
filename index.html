@@ -93,10 +93,17 @@
       overflow: hidden;
     }
     
-    #reader video {
-      transform: scaleX(-1);
-      -webkit-transform: scaleX(-1);
-    }
+   /* Camera display: normal direction by default */
+#reader video {
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+/* Mirror effect only when using front camera */
+#reader video.front-camera {
+  transform: scaleX(-1) !important;
+  -webkit-transform: scaleX(-1) !important;
+}
 
     #reader border {
       border: none !important;
@@ -494,16 +501,53 @@
       
       document.body.appendChild(script);
     }
+    function setCameraDisplayDirection() {
+  var video = document.querySelector("#reader video");
 
-    function initScanner() {
-      html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-        fps: 15, 
-        qrbox: { width: 250, height: 250 },
-        rememberLastUsedCamera: true,
-        aspectRatio: 1.0
-      }, false);
-      html5QrcodeScanner.render(onScanSuccess, function(error) {});
+  if (!video) return;
+
+  // Detect the active camera
+  var stream = video.srcObject;
+
+  if (stream) {
+    var track = stream.getVideoTracks()[0];
+
+    if (track) {
+      var settings = track.getSettings();
+
+      if (settings.facingMode === "user") {
+        // Front camera: mirror display
+        video.classList.add("front-camera");
+      } else {
+        // Back camera: normal display
+        video.classList.remove("front-camera");
+      }
     }
+  }
+}
+    function initScanner() {
+  html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+    fps: 15,
+    qrbox: { width: 250, height: 250 },
+    rememberLastUsedCamera: true,
+    aspectRatio: 1.0
+  }, false);
+
+  html5QrcodeScanner.render(
+    onScanSuccess,
+    function(error) {}
+  );
+
+  // Check camera direction after camera starts
+  var cameraCheck = setInterval(function() {
+    var video = document.querySelector("#reader video");
+
+    if (video && video.srcObject) {
+      setCameraDisplayDirection();
+      clearInterval(cameraCheck);
+    }
+  }, 300);
+}
 
     function resetScanner(delay) {
       setTimeout(function() {
