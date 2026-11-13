@@ -196,6 +196,7 @@ async function getDrumRollDuration(){
 }
 
 
+
 async function playDrumRollAndAnimate(numberEl) {
 
   drumRollAudio.pause();
@@ -203,6 +204,7 @@ async function playDrumRollAndAnimate(numberEl) {
 
   var finished = false;
   var animationFrame = null;
+  var lastChange = 0;
 
   numberEl.classList.add("rolling");
 
@@ -214,6 +216,7 @@ async function playDrumRollAndAnimate(numberEl) {
   return new Promise(function(resolve) {
 
     function finishRoll() {
+
       if (finished) return;
 
       finished = true;
@@ -226,39 +229,77 @@ async function playDrumRollAndAnimate(numberEl) {
       numberEl.classList.remove("rolling");
 
       drumRollAudio.removeEventListener("ended", finishRoll);
-      drumRollAudio.pause();
+      drumRollAudio.removeEventListener("error", finishRoll);
 
       resolve();
     }
 
-    function animate() {
+    function animate(timestamp) {
 
       if (finished) return;
 
-      if (drumRollAudio.ended || drumRollAudio.paused) {
+      if (drumRollAudio.ended) {
         finishRoll();
         return;
       }
 
-      numberEl.textContent =
-        String(Math.floor(Math.random() * 900) + 100);
+      var remaining =
+        drumRollAudio.duration - drumRollAudio.currentTime;
+
+      var interval;
+
+      // Fast rolling during the first part
+      if (remaining > 1) {
+        interval = 60;
+      }
+
+      // Gradually slow down during the final second
+      else if (remaining > 0.7) {
+        interval = 120;
+      }
+      else if (remaining > 0.4) {
+        interval = 200;
+      }
+      else {
+        interval = 300;
+      }
+
+      if (timestamp - lastChange >= interval) {
+
+        numberEl.textContent =
+          String(Math.floor(Math.random() * 900) + 100);
+
+        lastChange = timestamp;
+      }
 
       animationFrame = requestAnimationFrame(animate);
     }
 
-    drumRollAudio.addEventListener("ended", finishRoll);
+    drumRollAudio.addEventListener(
+      "ended",
+      finishRoll,
+      { once: true }
+    );
+
+    drumRollAudio.addEventListener(
+      "error",
+      finishRoll,
+      { once: true }
+    );
 
     drumRollAudio.play().then(function() {
+
       animationFrame = requestAnimationFrame(animate);
+
     }).catch(function(error) {
+
       console.log("Drum roll playback error:", error);
       finishRoll();
+
     });
 
   });
-}
-
-  
+} 
 async function runLuckyDraw() {
   var numberEl = document.getElementById("winnerNumber");
   var nameEl = document.getElementById("winnerName");
