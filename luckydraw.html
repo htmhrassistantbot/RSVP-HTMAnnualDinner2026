@@ -194,44 +194,39 @@ async function getDrumRollDuration(){
     ready();
   });
 }
+
 async function playDrumRollAndAnimate(numberEl) {
-  var duration = await getDrumRollDuration();
 
   drumRollAudio.pause();
   drumRollAudio.currentTime = 0;
 
-  var finished = false;
-  var lastChange = 0;
+  var audioStarted = false;
   var animationFrame = null;
-  var finishPromise;
-  var finishResolve;
+  var finished = false;
 
-  finishPromise = new Promise(function(resolve) {
-    finishResolve = resolve;
-  });
-
-  function finishRoll() {
+  function finishRoll(resolve) {
     if (finished) return;
+
     finished = true;
-    finishResolve();
-  }
 
-  function updateNumber(timestamp) {
-    if (finished) return;
-
-    if (timestamp - lastChange >= 70) {
-      numberEl.textContent =
-        String(Math.floor(Math.random() * 900) + 100);
-
-      lastChange = timestamp;
+    if (animationFrame !== null) {
+      cancelAnimationFrame(animationFrame);
     }
 
-    animationFrame = requestAnimationFrame(updateNumber);
+    drumRollAudio.removeEventListener("ended", onAudioEnded);
+
+    drumRollAudio.pause();
+
+    resolve();
   }
 
-  drumRollAudio.addEventListener("ended", finishRoll, { once: true });
+  var resolveRoll;
 
-  var audioStarted = false;
+  function onAudioEnded() {
+    if (resolveRoll) {
+      finishRoll(resolveRoll);
+    }
+  }
 
   if (soundEnabled) {
     try {
@@ -242,32 +237,72 @@ async function playDrumRollAndAnimate(numberEl) {
     }
   }
 
-  animationFrame = requestAnimationFrame(updateNumber);
+  if (!audioStarted) {
+    var fallbackDuration = await getDrumRollDuration();
+    var startTime = performance.now();
 
-  if (audioStarted) {
-    // Wait for the actual MP3 to finish.
-    await Promise.race([
-      finishPromise,
-      sleep((duration + 2) * 1000)
-    ]);
-  } else {
-    // Fallback when audio is unavailable.
-    await sleep(duration * 1000);
+    await new Promise(function(resolve) {
+
+      function animateWithoutAudio(timestamp) {
+        if (timestamp - startTime >= fallbackDuration * 1000) {
+          finishRoll(resolve);
+          return;
+        }
+
+        numberEl.textContent =
+          String(Math.floor(Math.random() * 900) + 100);
+
+        animationFrame = requestAnimationFrame(animateWithoutAudio);
+      }
+
+      animationFrame = requestAnimationFrame(animateWithoutAudio);
+    });
+
+    return;
   }
 
-  finished = true;
+  await new Promise(function(resolve) {
 
-  if (animationFrame !== null) {
-    cancelAnimationFrame(animationFrame);
-  }
+    resolveRoll = resolve;
 
-  drumRollAudio.removeEventListener("ended", finishRoll);
+    drumRollAudio.addEventListener(
+      "ended",
+      onAudioEnded,
+      { once: true }
+    );
 
-  if (audioStarted) {
-    drumRollAudio.pause();
-    drumRollAudio.currentTime = 0;
-  }
+    function animateWithAudio(timestamp) {
+
+      if (finished) return;
+
+      // Stop immediately when the MP3 reaches its end.
+      if (
+        drumRollAudio.ended ||
+        (
+          Number.isFinite(drumRollAudio.duration) &&
+          drumRollAudio.duration > 0 &&
+          drumRollAudio.currentTime >= drumRollAudio.duration - 0.03
+        )
+      ) {
+        finishRoll(resolve);
+        return;
+      }
+
+      // Change the number only while the MP3 is playing.
+      if (!drumRollAudio.paused) {
+        numberEl.textContent =
+          String(Math.floor(Math.random() * 900) + 100);
+      }
+
+      animationFrame = requestAnimationFrame(animateWithAudio);
+    }
+
+    animationFrame = requestAnimationFrame(animateWithAudio);
+
+  });
+
 }
+
   
 async function runLuckyDraw() {
   var numberEl = document.getElementById("winnerNumber");
