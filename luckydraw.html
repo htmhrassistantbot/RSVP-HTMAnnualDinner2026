@@ -1,1063 +1,268 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HTM Annual Dinner 2026 - Lucky Draw</title>
-
+<title>HTM Annual Dinner 2026 - Lucky Draw Display</title>
 <style>
-:root {
-  --gold:#d4af37;
-  --gold-light:#f3e5ab;
-  --bg:#0d0f12;
-  --panel:rgba(22,26,33,.94);
-}
-
-* { box-sizing:border-box; }
-
-body {
-  margin:0;
-  min-height:100vh;
-  padding:28px 16px 48px;
-  color:#fff;
-  text-align:center;
-  font-family:Georgia,'Times New Roman',serif;
-  background:var(--bg);
-  overflow-x:hidden;
-}
-
-.bg-slide {
-  position:fixed;
-  inset:0;
-  z-index:-2;
-  background-position:center;
-  background-size:cover;
-  opacity:0;
-  transition:opacity 1.5s;
-}
-
-.bg-slide.active { opacity:1; }
-
-.bg-overlay {
-  position:fixed;
-  inset:0;
-  z-index:-1;
-  background:rgba(13,15,18,.84);
-  pointer-events:none;
-}
-
-h1 {
-  margin:12px 0 6px;
-  color:var(--gold-light);
-  font-size:clamp(23px,4vw,34px);
-  font-weight:400;
-  letter-spacing:4px;
-  text-transform:uppercase;
-  text-shadow:0 2px 5px #000;
-}
-
-.subtitle {
-  font:11px 'Segoe UI',sans-serif;
-  color:#a0a8b5;
-  letter-spacing:4px;
-  text-transform:uppercase;
-  margin-bottom:30px;
-}
-
-.wrap {
-  max-width:760px;
-  margin:auto;
-}
-
-.panel {
-  padding:clamp(20px,4vw,36px);
-  border:1px solid var(--gold);
-  border-radius:12px;
-  background:var(--panel);
-  box-shadow:0 20px 50px #0009;
-}
-
-.eyebrow {
-  font:11px 'Segoe UI',sans-serif;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--gold);
-}
-
-.winner-box {
-  margin:20px auto 22px;
-  padding:25px 12px;
-  border:1px solid #8b6b1b;
-  border-radius:10px;
-  background:linear-gradient(135deg,#d4af371c,#0008);
-  min-height:180px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-}
-
-#winnerNumber {
-  font-size:clamp(58px,12vw,96px);
-  line-height:1.05;
-  font-weight:bold;
-  color:var(--gold-light);
-  letter-spacing:5px;
-  text-shadow:0 0 24px #d4af3755;
-  overflow-wrap:anywhere;
-}
-
-#winnerName {
-  font-size:clamp(18px,3vw,25px);
-  margin-top:12px;
-  color:#fff;
-}
-
-#winnerMeta {
-  font:12px 'Segoe UI',sans-serif;
-  color:#a0a8b5;
-  margin-top:8px;
-}
-
-button {
-  border:0;
-  border-radius:6px;
-  padding:15px 28px;
-  background:linear-gradient(#f3e5ab,#d4af37);
-  color:#171717;
-  font:700 13px 'Segoe UI',sans-serif;
-  letter-spacing:2px;
-  cursor:pointer;
-  box-shadow:0 5px 18px #0008;
-  transition:transform .15s,opacity .15s;
-}
-
-button:hover:not(:disabled) {
-  transform:translateY(-2px);
-}
-
-button:disabled {
-  opacity:.55;
-  cursor:wait;
-}
-
-.secondary {
-  margin-left:8px;
-  background:transparent;
-  border:1px solid var(--gold);
-  color:var(--gold-light);
-  box-shadow:none;
-}
-
-.stop-award-button {
-  margin-left:8px;
-  padding:9px 14px;
-  font-size:10px;
-  letter-spacing:1px;
-  background:#7b2525;
-  color:#fff;
-  border:1px solid #d46a6a;
-  box-shadow:none;
-  border-radius:5px;
-}
-
-.music-controls {
-  margin:0 auto 22px;
-  padding:14px;
-  border:1px solid #ffffff25;
-  border-radius:8px;
-  background:#0004;
-  max-width:420px;
-  font:12px 'Segoe UI',sans-serif;
-}
-
-.music-controls button {
-  padding:9px 16px;
-  font-size:11px;
-  margin-bottom:10px;
-}
-
-.volume-row {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  color:#c4cbd5;
-}
-
-.volume-row input {
-  width:130px;
-  accent-color:var(--gold);
-}
-
-#message {
-  min-height:22px;
-  margin-top:15px;
-  font:12px 'Segoe UI',sans-serif;
-  color:#c4cbd5;
-}
-
-.stats {
-  display:flex;
-  justify-content:center;
-  gap:34px;
-  flex-wrap:wrap;
-  margin:24px 0 8px;
-}
-
-.stat strong {
-  display:block;
-  color:var(--gold-light);
-  font-size:27px;
-}
-
-.stat span {
-  font:10px 'Segoe UI',sans-serif;
-  color:#8a94a6;
-  letter-spacing:2px;
-  text-transform:uppercase;
-}
-
-.history {
-  margin-top:28px;
-  text-align:left;
-}
-
-.history h2 {
-  font-size:16px;
-  font-weight:400;
-  letter-spacing:3px;
-  color:var(--gold-light);
-  text-align:center;
-  text-transform:uppercase;
-}
-
-.table-wrap {
-  overflow-x:auto;
-  border:1px solid #ffffff20;
-  border-radius:8px;
-}
-
-table {
-  width:100%;
-  border-collapse:collapse;
-  font:13px 'Segoe UI',sans-serif;
-}
-
-th,td {
-  padding:11px 13px;
-  border-bottom:1px solid #ffffff16;
-  text-align:left;
-}
-
-th {
-  color:var(--gold);
-  font-size:10px;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-  background:#ffffff08;
-}
-
-td:first-child {
-  color:var(--gold-light);
-  font-weight:700;
-}
-
-tbody tr:last-child td { border-bottom:0; }
-
-.empty {
-  text-align:center;
-  color:#8a94a6;
-  padding:18px;
-}
-
-.note {
-  margin-top:22px;
-  color:#788292;
-  font:10px 'Segoe UI',sans-serif;
-  line-height:1.6;
-}
-
-@keyframes reveal {
-  0% { transform:scale(.75);opacity:.2; }
-  70% { transform:scale(1.08); }
-  100% { transform:scale(1);opacity:1; }
-}
-
-.reveal { animation:reveal .65s ease-out; }
-
-@media(max-width:520px) {
-  .secondary {
-    margin:10px 0 0;
-  }
-
-  .stop-award-button {
-    margin:10px 0 0;
-  }
-
-  .panel {
-    padding:18px 12px;
-  }
-
-  .stats {
-    gap:20px;
-  }
-}
+:root{--gold:#d4af37;--goldLight:#f3e5ab;--bg:#0d0f12;--panel:rgba(22,26,33,.94)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:24px 16px 40px;color:#fff;text-align:center;font-family:Georgia,'Times New Roman',serif;background:var(--bg);overflow-x:hidden}
+.bg-slide{position:fixed;inset:0;z-index:-2;background-position:center;background-size:cover;opacity:0;transition:opacity 1.5s}
+.bg-slide.active{opacity:1}
+.bg-overlay{position:fixed;inset:0;z-index:-1;background:rgba(13,15,18,.84);pointer-events:none}
+.wrap{max-width:1100px;margin:auto}
+h1{margin:12px 0 6px;color:var(--goldLight);font-size:clamp(25px,4vw,44px);font-weight:400;letter-spacing:4px;text-transform:uppercase;text-shadow:0 2px 5px #000}
+.subtitle{font:12px 'Segoe UI',sans-serif;color:#a0a8b5;letter-spacing:5px;text-transform:uppercase;margin-bottom:25px}
+.panel{padding:clamp(20px,4vw,42px);border:1px solid var(--gold);border-radius:14px;background:var(--panel);box-shadow:0 20px 50px #0009}
+.eyebrow{font:12px 'Segoe UI',sans-serif;letter-spacing:4px;text-transform:uppercase;color:var(--gold)}
+.winner-box{margin:20px auto;padding:30px 12px;border:1px solid #8b6b1b;border-radius:12px;background:linear-gradient(135deg,#d4af3722,#0008);min-height:260px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+#winnerNumber{font-size:clamp(76px,17vw,160px);line-height:1.05;font-weight:bold;color:var(--goldLight);letter-spacing:8px;text-shadow:0 0 30px #d4af3770;overflow-wrap:anywhere}
+#winnerName{font-size:clamp(22px,4vw,38px);margin-top:16px;color:#fff}
+#winnerMeta{font:15px 'Segoe UI',sans-serif;color:#a0a8b5;margin-top:10px}
+#message{min-height:25px;margin-top:18px;font:14px 'Segoe UI',sans-serif;color:#d8dce3}
+.stats{display:flex;justify-content:center;gap:55px;flex-wrap:wrap;margin:24px 0}
+.stat strong{display:block;color:var(--goldLight);font-size:34px}
+.stat span{font:11px 'Segoe UI',sans-serif;color:#a0a8b5;letter-spacing:2px;text-transform:uppercase}
+.history{margin-top:30px;text-align:left}
+.history h2{font-size:18px;font-weight:400;letter-spacing:3px;color:var(--goldLight);text-align:center;text-transform:uppercase}
+.table-wrap{overflow-x:auto;border:1px solid #ffffff20;border-radius:8px}
+table{width:100%;border-collapse:collapse;font:14px 'Segoe UI',sans-serif}
+th,td{padding:12px 14px;border-bottom:1px solid #ffffff16;text-align:left}
+th{color:var(--gold);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;background:#ffffff08}
+td:first-child{color:var(--goldLight);font-weight:700}
+tbody tr:last-child td{border-bottom:0}
+.empty{text-align:center;color:#8a94a6;padding:20px}
+.note{margin-top:22px;color:#788292;font:11px 'Segoe UI',sans-serif;line-height:1.6}
+.reveal{animation:reveal .65s ease-out}
+.rolling{animation:pulse .12s infinite alternate}
+@keyframes reveal{0%{transform:scale(.65);opacity:.2}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{from{opacity:.65;transform:scale(.98)}to{opacity:1;transform:scale(1.02)}}
+.audio-start{margin:0 auto 18px;padding:12px 20px;border:1px solid var(--gold);border-radius:6px;background:transparent;color:var(--goldLight);font:12px 'Segoe UI',sans-serif;letter-spacing:1px;cursor:pointer}
+@media(max-width:600px){.panel{padding:18px 10px}.stats{gap:25px}.winner-box{min-height:200px}}
 </style>
 </head>
-
 <body>
-
-<div id="slide1" class="bg-slide active"></div>
-<div id="slide2" class="bg-slide"></div>
-<div class="bg-overlay"></div>
-
+<div id="slide1" class="bg-slide active"></div><div id="slide2" class="bg-slide"></div><div class="bg-overlay"></div>
 <main class="wrap">
-
-<h1>HTM Annual Dinner 2026</h1>
-<div class="subtitle">Lucky Draw Celebration</div>
-
-<section class="panel">
-
-  <!-- BACKGROUND MUSIC -->
-
-  <div class="music-controls">
-
-    <div style="color:#f3e5ab;margin-bottom:10px;letter-spacing:2px;">
-      ♪ EVENT BACKGROUND MUSIC
+  <h1>HTM Annual Dinner 2026</h1>
+  <div class="subtitle">Lucky Draw Celebration</div>
+  <section class="panel">
+    <button id="audioStartButton" class="audio-start" type="button">🔊 ENABLE DISPLAY SOUND</button>
+    <div class="eyebrow">And the lucky winner is...</div>
+    <div class="winner-box" aria-live="polite">
+      <div id="winnerNumber">READY</div>
+      <div id="winnerName">Good luck everyone!</div>
+      <div id="winnerMeta"></div>
     </div>
-
-    <button id="musicButton"
-      type="button"
-      onclick="toggleBackgroundMusic()">
-      ▶ PLAY BACKGROUND MUSIC
-    </button>
-
-    <div class="volume-row">
-      <span>VOLUME</span>
-
-      <input type="range"
-        id="musicVolume"
-        min="0"
-        max="100"
-        value="25"
-        oninput="changeBackgroundVolume(this.value)">
-
-      <span id="volumeValue">25%</span>
+    <div id="message" role="status">Waiting for the host to start the lucky draw from the iPad...</div>
+    <div class="stats">
+      <div class="stat"><strong id="remainingCount">—</strong><span>Numbers remaining</span></div>
+      <div class="stat"><strong id="winnerCount">—</strong><span>Winners drawn</span></div>
     </div>
-
-  </div>
-
-  <div class="eyebrow">And the lucky winner is...</div>
-
-  <div class="winner-box" aria-live="polite">
-    <div id="winnerNumber">READY</div>
-    <div id="winnerName">Good luck everyone!</div>
-    <div id="winnerMeta"></div>
-  </div>
-
-  <!-- DRAW BUTTON -->
-
-  <button id="drawButton"
-    type="button"
-    onclick="startLuckyDraw()">
-    🎁 START LUCKY DRAW
-  </button>
-
-  <!-- STOP AWARD MUSIC -->
-
-  <button id="stopAwardButton"
-    class="stop-award-button"
-    type="button"
-    onclick="stopAwardMusic()">
-    ■ STOP AWARD MUSIC
-  </button>
-
-  <button id="historyButton"
-    class="secondary"
-    type="button"
-    onclick="loadHistory()">
-    REFRESH WINNER HISTORY
-  </button>
-
-  <div id="message" role="status">
-    Ready to draw one winner.
-  </div>
-
-  <div class="stats">
-
-    <div class="stat">
-      <strong id="remainingCount">—</strong>
-      <span>Numbers remaining</span>
+    <div class="history">
+      <h2>Winner History</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>No.</th><th>Lucky Draw No.</th><th>Winner</th><th>Guest ID</th><th>Drawn At</th></tr></thead>
+          <tbody id="historyBody"><tr><td colspan="5" class="empty">Loading winner history...</td></tr></tbody>
+        </table>
+      </div>
     </div>
-
-    <div class="stat">
-      <strong id="winnerCount">—</strong>
-      <span>Winners drawn</span>
-    </div>
-
-  </div>
-
-  <!-- WINNER HISTORY -->
-
-  <div class="history">
-
-    <h2>Winner History</h2>
-
-    <div class="table-wrap">
-
-      <table>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Lucky Draw No.</th>
-            <th>Winner</th>
-            <th>Guest ID</th>
-            <th>Drawn At</th>
-          </tr>
-        </thead>
-
-        <tbody id="historyBody">
-          <tr>
-            <td colspan="5" class="empty">
-              Loading winner history...
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-    </div>
-  </div>
-
-  <div class="note">
-    Each lucky draw number can win only once.
-    Results are recorded in the Google Sheets Attendance tab.
-  </div>
-
-</section>
+    <div class="note">Controlled remotely by the host iPad. Each lucky draw number can win only once.</div>
+  </section>
 </main>
-
 <script>
+var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
 
-/****************************************************
- * GOOGLE APPS SCRIPT URL
- ****************************************************/
-
-var GOOGLE_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
-
-
-/****************************************************
- * BACKGROUND SLIDESHOW
- ****************************************************/
-
-var wallpaperList = [
-  "bg1.jpeg",
-  "bg2.jpeg",
-  "bg3.jpeg",
-  "bg4.jpeg"
-];
-
-var currentBgIndex = 0;
-var activeSlide = 1;
-
-function rotateWallpapers() {
-
-  if (wallpaperList.length < 2) return;
-
-  var next = (currentBgIndex + 1) % wallpaperList.length;
-
-  var current = document.getElementById(
-    activeSlide === 1 ? "slide1" : "slide2"
-  );
-
-  var target = document.getElementById(
-    activeSlide === 1 ? "slide2" : "slide1"
-  );
-
-  target.style.backgroundImage =
-    "url('" + wallpaperList[next] + "')";
-
-  target.classList.add("active");
-  current.classList.remove("active");
-
-  activeSlide = activeSlide === 1 ? 2 : 1;
-  currentBgIndex = next;
+var wallpaperList=["bg1.jpeg","bg2.jpeg","bg3.jpeg","bg4.jpeg"];
+var currentBgIndex=0,activeSlide=1;
+function rotateWallpapers(){
+  if(wallpaperList.length<2)return;
+  var next=(currentBgIndex+1)%wallpaperList.length;
+  var current=document.getElementById(activeSlide===1?"slide1":"slide2");
+  var target=document.getElementById(activeSlide===1?"slide2":"slide1");
+  target.style.backgroundImage="url('"+wallpaperList[next]+"')";
+  target.classList.add("active");current.classList.remove("active");
+  activeSlide=activeSlide===1?2:1;currentBgIndex=next;
 }
-
-function initSlideshow() {
-
-  if (wallpaperList.length > 0) {
-
-    document.getElementById("slide1").style.backgroundImage =
-      "url('" + wallpaperList[0] + "')";
-
-    setInterval(rotateWallpapers, 6000);
+function initSlideshow(){
+  if(wallpaperList.length){
+    document.getElementById("slide1").style.backgroundImage="url('"+wallpaperList[0]+"')";
+    setInterval(rotateWallpapers,6000);
   }
 }
 
+var backgroundAudio=new Audio("https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Intro.mp3");
+backgroundAudio.loop=true;backgroundAudio.volume=.25;
+var drumRollAudio=new Audio("https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/DrumRoll.mp3");
+drumRollAudio.loop=true;drumRollAudio.volume=.85;
+var awardAudio=new Audio("https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Awards.mp3");
+awardAudio.loop=false;awardAudio.volume=.85;
+var soundEnabled=false,backgroundMusicEnabled=false;
 
-/****************************************************
- * BACKGROUND MUSIC
- ****************************************************/
-
-var backgroundAudio = null;
-var backgroundMusicEnabled = false;
-var backgroundVolume = 0.25;
-
-function setupBackgroundMusic() {
-
-  if (!backgroundAudio) {
-
-    backgroundAudio = new Audio(
-      "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Intro.mp3"
-    );
-
-    backgroundAudio.loop = true;
-    backgroundAudio.volume = backgroundVolume;
+document.getElementById("audioStartButton").addEventListener("click",async function(){
+  soundEnabled=true;
+  this.textContent="✓ DISPLAY SOUND ENABLED";
+  try{
+    await backgroundAudio.play();
+    backgroundMusicEnabled=true;
+  }catch(e){
+    document.getElementById("message").textContent="Sound enabled. Background music could not start; check Intro.mp3.";
   }
-}
-
-async function toggleBackgroundMusic() {
-
-  setupBackgroundMusic();
-
-  var button = document.getElementById("musicButton");
-
-  if (!backgroundMusicEnabled) {
-
-    try {
-
-      await backgroundAudio.play();
-
-      backgroundMusicEnabled = true;
-      button.textContent = "❚❚ PAUSE BACKGROUND MUSIC";
-
-    } catch (error) {
-
-      document.getElementById("message").textContent =
-        "Music could not play. Please check Intro.mp3.";
-
-      console.log(error);
-    }
-
-  } else {
-
-    backgroundAudio.pause();
-    backgroundMusicEnabled = false;
-
-    button.textContent = "▶ PLAY BACKGROUND MUSIC";
-  }
-}
-
-function changeBackgroundVolume(value) {
-
-  backgroundVolume = Number(value) / 100;
-
-  document.getElementById("volumeValue").textContent =
-    value + "%";
-
-  if (backgroundAudio) {
-    backgroundAudio.volume = backgroundVolume;
-  }
-}
-
-function pauseBackgroundMusic() {
-
-  if (backgroundAudio && backgroundMusicEnabled) {
-    backgroundAudio.pause();
-  }
-}
-
-async function resumeBackgroundMusic() {
-
-  if (backgroundAudio && backgroundMusicEnabled) {
-
-    try {
-      await backgroundAudio.play();
-    } catch (error) {
-      console.log(error);
-    }
-  }
-}
-
-
-/****************************************************
- * DRUM ROLL MUSIC
- ****************************************************/
-
-var drumRollAudio = new Audio(
-  "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/DrumRoll.mp3"
-);
-
-drumRollAudio.loop = true;
-drumRollAudio.volume = 0.85;
-
-function startDrumRoll() {
-
-  drumRollAudio.currentTime = 0;
-
-  drumRollAudio.play().catch(function(error) {
-
-    console.log("Drum roll error:", error);
-
-    document.getElementById("message").textContent =
-      "Drum roll could not play. Please check DrumRoll.mp3.";
-  });
-}
-
-function stopDrumRoll() {
-
-  drumRollAudio.pause();
-  drumRollAudio.currentTime = 0;
-}
-
-
-/****************************************************
- * AWARD CELEBRATION MUSIC
- ****************************************************/
-
-var awardAudio = new Audio(
-  "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Awards.mp3"
-);
-
-awardAudio.loop = false;
-awardAudio.volume = 0.85;
-
-function playAwardMusic() {
-
-  awardAudio.currentTime = 0;
-
-  awardAudio.play().catch(function(error) {
-    console.log("Award music error:", error);
-  });
-}
-
-function stopAwardMusic() {
-
-  awardAudio.pause();
-  awardAudio.currentTime = 0;
-
-  document.getElementById("message").textContent =
-    "Award celebration music stopped by host.";
-}
-
-
-/****************************************************
- * EXCITEMENT VOICE ANNOUNCER
- ****************************************************/
-
-var speechSupported =
-  "speechSynthesis" in window &&
-  "SpeechSynthesisUtterance" in window;
-
-var announcerVoice = null;
-
-function selectAnnouncerVoice() {
-
-  if (!speechSupported) return;
-
-  var voices = window.speechSynthesis.getVoices();
-
-  // Prefer an English voice.
-  announcerVoice =
-    voices.find(function(v) {
-      return v.lang === "en-US";
-    }) ||
-    voices.find(function(v) {
-      return v.lang === "en-GB";
-    }) ||
-    voices.find(function(v) {
-      return v.lang &&
-        v.lang.toLowerCase().startsWith("en");
-    }) ||
-    null;
-}
-
-// Some browsers load voices asynchronously.
-if (speechSupported) {
-
-  selectAnnouncerVoice();
-
-  window.speechSynthesis.onvoiceschanged =
-    selectAnnouncerVoice;
-}
-
-
-
-function announceWinner(number, winnerName) {
-
-  return new Promise(function(resolve) {
-
-    if (!("speechSynthesis" in window)) {
-      resolve();
-      return;
-    }
-
-    window.speechSynthesis.cancel();
-
-    var digits = String(number)
-      .split("")
-      .filter(function(d) {
-        return /^[0-9]$/.test(d);
-      })
-      .join(", ");
-
-    var speech = new SpeechSynthesisUtterance(digits);
-
-    speech.rate = 1.20;
-    speech.pitch = 1.15;
-    speech.volume = 3;
-
-    speech.lang = "en-US";
-
-    speech.onend = resolve;
-    speech.onerror = resolve;
-
-    window.speechSynthesis.speak(speech);
-
-    setTimeout(resolve, 15000);
-
-  });
-}
-
-
-
-/****************************************************
- * GOOGLE APPS SCRIPT JSONP CONNECTION
- ****************************************************/
-
-var requestTimer = null;
-
-function jsonp(action) {
-
-  return new Promise(function(resolve, reject) {
-
-    var old = document.getElementById("luckyDrawRequest");
-
-    if (old) old.remove();
-
-    var callback = "handleLuckyDrawResponse";
-
-    window[callback] = function(response) {
-      cleanup();
-      resolve(response);
-    };
-
-    var script = document.createElement("script");
-
-    script.id = "luckyDrawRequest";
-
-    script.src =
-      GOOGLE_SCRIPT_URL +
-      "?action=" + encodeURIComponent(action) +
-      "&callback=" + callback;
-
-    script.onerror = function() {
-
-      cleanup();
-
-      reject(
-        new Error("Could not connect to Google Apps Script.")
-      );
-    };
-
-    requestTimer = setTimeout(function() {
-
-      cleanup();
-
-      reject(
-        new Error(
-          "The request timed out. Please check your connection and try again."
-        )
-      );
-
-    }, 30000);
-
-    function cleanup() {
-
-      if (requestTimer) {
-        clearTimeout(requestTimer);
-      }
-
-      requestTimer = null;
-
-      script.remove();
-
-      try {
-        delete window[callback];
-      } catch (e) {
-        window[callback] = undefined;
-      }
-    }
-
+});
+
+function jsonp(params){
+  return new Promise(function(resolve,reject){
+    var callback="htmRemoteCb_"+Date.now()+"_"+Math.floor(Math.random()*100000);
+    var script=document.createElement("script");
+    var timer=setTimeout(function(){cleanup();reject(new Error("Request timed out."));},15000);
+    function cleanup(){clearTimeout(timer);script.remove();try{delete window[callback];}catch(e){window[callback]=undefined;}}
+    window[callback]=function(response){cleanup();resolve(response);};
+    params.callback=callback;
+    script.onerror=function(){cleanup();reject(new Error("Could not connect to Google Apps Script."));};
+    script.src=GOOGLE_SCRIPT_URL+"?"+Object.keys(params).map(function(k){return encodeURIComponent(k)+"="+encodeURIComponent(params[k]);}).join("&");
     document.body.appendChild(script);
   });
 }
-
-
-/****************************************************
- * START LUCKY DRAW
- ****************************************************/
-
-async function startLuckyDraw() {
-
-  var button = document.getElementById("drawButton");
-  var historyButton = document.getElementById("historyButton");
-
-  var number = document.getElementById("winnerNumber");
-  var name = document.getElementById("winnerName");
-  var meta = document.getElementById("winnerMeta");
-  var message = document.getElementById("message");
-
-  if (button.disabled) return;
-
-  button.disabled = true;
-  historyButton.disabled = true;
-
-  button.textContent = "DRAWING...";
-
-  number.textContent = "✦";
-  name.textContent = "Selecting one eligible number...";
-  meta.textContent = "";
-
-  message.textContent =
-    "Please wait. The lucky draw is in progress...";
-
-  // Stop any previous voice announcement.
-  if (speechSupported) {
+function api(action,extra){var p=extra||{};p.action=action;return jsonp(p);}
+function escapeHtml(value){
+  return String(value==null?"":value).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});
+}
+async function loadHistory(){
+  try{
+    var response=await api("history");
+    if(String(response).indexOf("HISTORY|")!==0)throw new Error(String(response));
+    var payload=JSON.parse(String(response).slice(8));
+    var items=payload.winners||[];
+    document.getElementById("winnerCount").textContent=items.length;
+    document.getElementById("remainingCount").textContent=payload.remaining;
+    var body=document.getElementById("historyBody");
+    if(!items.length){body.innerHTML='<tr><td colspan="5" class="empty">No winners yet. The draw is ready.</td></tr>';return;}
+    body.innerHTML=items.map(function(x,i){
+      return "<tr><td>"+(i+1)+"</td><td>"+escapeHtml(x.number)+"</td><td>"+escapeHtml(x.name)+"</td><td>"+escapeHtml(x.id)+"</td><td>"+escapeHtml(x.time)+"</td></tr>";
+    }).join("");
+  }catch(err){document.getElementById("message").textContent="Could not refresh winner history: "+err.message;}
+}
+function pauseBackgroundMusic(){if(backgroundAudio){backgroundAudio.pause();backgroundMusicEnabled=false;}}
+async function playBackgroundMusic(){
+  if(soundEnabled){try{await backgroundAudio.play();backgroundMusicEnabled=true;}catch(e){}}
+}
+function stopDrumRoll(){drumRollAudio.pause();drumRollAudio.currentTime=0;}
+function stopAwardMusic(){awardAudio.pause();awardAudio.currentTime=0;}
+function reportResult(status,result){
+  return api("remoteResult",{
+    status:status,
+    number:result.number||"",
+    name:result.name||"",
+    guestId:result.guestId||"",
+    remaining:result.remaining||"",
+    message:result.message||""
+  }).catch(function(e){console.log("Could not report remote result:",e);});
+}
+function announceNumber(number){
+  return new Promise(function(resolve){
+    if(!("speechSynthesis" in window)){resolve();return;}
     window.speechSynthesis.cancel();
+    var digits=String(number).split("").filter(function(d){return /^[0-9]$/.test(d);}).join(", ");
+    var speech=new SpeechSynthesisUtterance(digits);
+    speech.rate=1.2;speech.pitch=1.15;speech.volume=1;speech.lang="en-US";
+    speech.onend=resolve;speech.onerror=resolve;
+    window.speechSynthesis.speak(speech);
+    setTimeout(resolve,15000);
+  });
+}
+function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
+async function runLuckyDraw(){
+  var numberEl=document.getElementById("winnerNumber");
+  var nameEl=document.getElementById("winnerName");
+  var metaEl=document.getElementById("winnerMeta");
+  var messageEl=document.getElementById("message");
+  pauseBackgroundMusic();stopAwardMusic();
+  if("speechSynthesis" in window)window.speechSynthesis.cancel();
+
+  messageEl.textContent="The host has started the lucky draw. Good luck!";
+  numberEl.classList.add("rolling");
+  nameEl.textContent="Selecting the lucky number...";
+  metaEl.textContent="";
+  if(soundEnabled){drumRollAudio.currentTime=0;drumRollAudio.play().catch(function(){});}
+
+  var start=Date.now();
+  while(Date.now()-start<4000){
+    numberEl.textContent=String(Math.floor(Math.random()*900)+100);
+    await sleep(90);
   }
 
-  // Stop background music.
-  pauseBackgroundMusic();
-
-  // Stop previous award music.
-  awardAudio.pause();
-  awardAudio.currentTime = 0;
-
-  // Start drum roll.
-  startDrumRoll();
-
-  var winnerSelected = false;
-
-  try {
-
-    // Drum roll plays for at least 4 seconds.
-    var results = await Promise.all([
-
-      jsonp("draw"),
-
-      new Promise(function(resolve) {
-        setTimeout(resolve, 4000);
-      })
-
-    ]);
-
-    var response = results[0];
-
+  try{
+    var response=await api("draw");
     stopDrumRoll();
+    numberEl.classList.remove("rolling");
 
-    var p = String(response).split("|");
-
-    if (p[0] === "DRAWN") {
-
-      winnerSelected = true;
-
-      number.textContent = p[1];
-
-      number.classList.remove("reveal");
-      void number.offsetWidth;
-      number.classList.add("reveal");
-
-      name.textContent = p[2] || "Winner";
-
-      meta.textContent =
-        "Guest ID: " + (p[3] || "-");
-
-      document.getElementById("remainingCount").textContent =
-        p[4];
-
-      message.textContent =
-        "CONGRATULATIONS! Announcing our lucky winner...";
-
-      // Update winner history.
-      await loadHistory(false);
-
-      // Announce the number and winner's name.
-      await announceWinner(p[1], p[2]);
-
-      // Start celebration music after voice announcement.
-      message.textContent =
-        "CONGRATULATIONS! We have a winner!";
-
-      playAwardMusic();
-
-    } else if (p[0] === "EMPTY") {
-
-      number.textContent = "FINISHED";
-
-      name.textContent =
-        "All eligible numbers have been drawn.";
-
-      meta.textContent = "";
-
-      message.textContent = "No numbers remain.";
-
-      document.getElementById("remainingCount").textContent = "0";
-
-    } else {
-
-      throw new Error(
-        p.slice(1).join("|") || "Unknown response from server."
-      );
+    var parts=String(response).split("|");
+    if(parts[0]==="DRAWN"){
+      var result={number:parts[1]||"",name:parts[2]||"Winner",guestId:parts[3]||"-",remaining:parts[4]||"0"};
+      numberEl.textContent=result.number;
+      numberEl.classList.remove("reveal");void numberEl.offsetWidth;numberEl.classList.add("reveal");
+      nameEl.textContent=result.name;
+      metaEl.textContent="Guest ID: "+result.guestId;
+      document.getElementById("remainingCount").textContent=result.remaining;
+      messageEl.textContent="CONGRATULATIONS! Announcing the lucky number...";
+      await loadHistory();
+      await announceNumber(result.number);
+      messageEl.textContent="CONGRATULATIONS! We have a winner!";
+      if(soundEnabled){awardAudio.currentTime=0;awardAudio.play().catch(function(){});}
+      await reportResult("complete",result);
+    }else if(parts[0]==="EMPTY"){
+      numberEl.textContent="FINISHED";nameEl.textContent="All eligible numbers have been drawn.";metaEl.textContent="";
+      messageEl.textContent="No eligible numbers remain.";
+      document.getElementById("remainingCount").textContent="0";
+      await reportResult("empty",{message:"All eligible numbers have been drawn.",remaining:"0"});
+    }else{
+      throw new Error(parts.slice(1).join("|")||"Unknown server response.");
     }
-
-  } catch (err) {
-
-    stopDrumRoll();
-
-    message.textContent = "Error: " + err.message;
-
-    name.textContent = "Please check the connection.";
-
-  } finally {
-
-    stopDrumRoll();
-
-    button.disabled = false;
-    historyButton.disabled = false;
-
-    button.textContent = "🎁 DRAW NEXT WINNER";
-
-    // Keep background music paused after a winner is selected.
-    if (!winnerSelected) {
-      resumeBackgroundMusic();
-    }
+  }catch(err){
+    stopDrumRoll();numberEl.classList.remove("rolling");
+    messageEl.textContent="Draw error: "+err.message;
+    nameEl.textContent="Please check the connection.";
+    await reportResult("error",{message:err.message});
+    await playBackgroundMusic();
   }
 }
 
-
-/****************************************************
- * LOAD WINNER HISTORY
- ****************************************************/
-
-async function loadHistory(showMessage) {
-
-  if (showMessage !== false) {
-
-    document.getElementById("message").textContent =
-      "Refreshing winner history...";
-  }
-
-  try {
-
-    var response = await jsonp("history");
-
-    var prefix = "HISTORY|";
-
-    if (String(response).indexOf(prefix) !== 0) {
-
-      throw new Error(String(response));
+var pollBusy=false;
+var handledCommands={};
+async function pollCommands(){
+  if(pollBusy)return;
+  pollBusy=true;
+  try{
+    var response=await api("remotePoll");
+    if(String(response).indexOf("COMMAND|")===0){
+      var payload=JSON.parse(String(response).slice(8));
+      var command=payload.command;
+      if(command && !handledCommands[command.id]){
+        handledCommands[command.id]=true;
+        await api("remoteAck",{commandId:command.id});
+        if(command.type==="draw"){
+          await runLuckyDraw();
+        }else if(command.type==="stopAward"){
+          stopAwardMusic();
+          document.getElementById("message").textContent="Award celebration music stopped by the host.";
+        }
+      }
     }
-
-    var payload = JSON.parse(
-      String(response).slice(prefix.length)
-    );
-
-    var items = payload.winners || [];
-
-    var body = document.getElementById("historyBody");
-
-    document.getElementById("winnerCount").textContent =
-      items.length;
-
-    document.getElementById("remainingCount").textContent =
-      payload.remaining;
-
-    if (!items.length) {
-
-      body.innerHTML =
-        '<tr><td colspan="5" class="empty">' +
-        'No winners yet. The draw is ready.' +
-        '</td></tr>';
-
-    } else {
-
-      body.innerHTML = items.map(function(x, i) {
-
-        return '<tr>' +
-          '<td>' + (i + 1) + '</td>' +
-          '<td>' + escapeHtml(x.number) + '</td>' +
-          '<td>' + escapeHtml(x.name) + '</td>' +
-          '<td>' + escapeHtml(x.id) + '</td>' +
-          '<td>' + escapeHtml(x.time) + '</td>' +
-          '</tr>';
-
-      }).join("");
-    }
-
-    if (showMessage !== false) {
-
-      document.getElementById("message").textContent =
-        "Winner history updated.";
-    }
-
-  } catch (err) {
-
-    document.getElementById("historyBody").innerHTML =
-      '<tr><td colspan="5" class="empty">' +
-      'Could not load history: ' +
-      escapeHtml(err.message) +
-      '</td></tr>';
-
-    if (showMessage !== false) {
-
-      document.getElementById("message").textContent =
-        "History could not be loaded.";
-    }
-  }
+  }catch(err){console.log("Remote polling:",err.message);}
+  finally{pollBusy=false;}
 }
-
-
-/****************************************************
- * HTML SECURITY HELPER
- ****************************************************/
-
-function escapeHtml(value) {
-
-  return String(value == null ? "" : value).replace(
-    /[&<>"']/g,
-    function(c) {
-
-      return {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      }[c];
-    }
-  );
+function startRemotePolling(){
+  pollCommands();
+  setInterval(pollCommands,1000);
+  setInterval(loadHistory,20000);
 }
-
-
-/****************************************************
- * PAGE INITIALIZATION
- ****************************************************/
-
-window.addEventListener("load", function() {
-
+window.addEventListener("load",function(){
   initSlideshow();
-
   loadHistory();
-
-  setupBackgroundMusic();
-
+  startRemotePolling();
 });
-
 </script>
-
 </body>
 </html>
