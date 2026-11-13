@@ -144,10 +144,42 @@ async function loadHistory(){
     }).join("");
   }catch(err){document.getElementById("message").textContent="Could not refresh winner history: "+err.message;}
 }
-function pauseBackgroundMusic(){if(backgroundAudio){backgroundAudio.pause();backgroundMusicEnabled=false;}}
-async function playBackgroundMusic(){
-  if(soundEnabled){try{await backgroundAudio.play();backgroundMusicEnabled=true;}catch(e){}}
+
+function pauseBackgroundMusic(){
+
+  if(backgroundAudio){
+    // Keep music playing, but mute it during the lucky draw
+    backgroundAudio.volume = 0;
+  }
+
 }
+
+
+async function playBackgroundMusic(){
+
+  if(soundEnabled && backgroundAudio){
+
+    // Restore background music volume
+    backgroundAudio.volume = 0.25;
+
+    // Only attempt playback if it is not already playing
+    if(backgroundAudio.paused){
+
+      try{
+        await backgroundAudio.play();
+        backgroundMusicEnabled = true;
+      }catch(e){
+        console.log("Background music playback error:", e);
+      }
+
+    }else{
+      backgroundMusicEnabled = true;
+    }
+
+  }
+
+}
+
 function stopDrumRoll(){drumRollAudio.pause();drumRollAudio.currentTime=0;}
 function stopAwardMusic(){awardAudio.pause();awardAudio.currentTime=0;}
 function reportResult(status,result){
