@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTM Annual Dinner 2026 - Host Controller</title>
+<style>
+:root{--gold:#d4af37;--goldLight:#f3e5ab;--bg:#0d0f12;--panel:#171b22}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:22px 14px 40px;background:radial-gradient(circle at top,#29251a 0,#0d0f12 48%);color:#fff;font-family:'Segoe UI',Arial,sans-serif}
+.wrap{max-width:560px;margin:auto}
+header{text-align:center;margin:12px 0 24px}
+h1{font:normal clamp(23px,5vw,32px) Georgia,serif;color:var(--goldLight);letter-spacing:2px;margin:0 0 8px}
+.subtitle{font-size:11px;color:#9da6b4;letter-spacing:3px;text-transform:uppercase}
+.panel{background:rgba(23,27,34,.96);border:1px solid var(--gold);border-radius:14px;padding:22px;box-shadow:0 18px 45px #0009}
+.label{font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;text-align:center}
+.status{margin:10px 0 22px;text-align:center;font:normal 32px Georgia,serif;color:var(--goldLight)}
+button{width:100%;border:0;border-radius:9px;padding:20px 12px;font-size:17px;font-weight:800;letter-spacing:1px;cursor:pointer;touch-action:manipulation}
+button:disabled{opacity:.45;cursor:not-allowed}
+.start{background:linear-gradient(#f3e5ab,#d4af37);color:#171717;box-shadow:0 6px 20px #0008}
+.stop{margin-top:12px;background:#7b2525;color:#fff;border:1px solid #d46a6a}
+.refresh{margin-top:12px;background:transparent;color:var(--goldLight);border:1px solid var(--gold);font-size:14px;padding:15px}
+.message{min-height:42px;margin:17px 0 8px;text-align:center;color:#c4cbd5;font-size:13px;line-height:1.5}
+.result{margin-top:18px;padding:17px;border:1px solid #ffffff25;border-radius:9px;background:#0004;text-align:center}
+.result .small{font-size:10px;letter-spacing:2px;color:var(--gold)}
+.result .number{font: bold 46px Georgia,serif;color:var(--goldLight);margin:7px 0}
+.result .name{font-size:16px;color:#fff}
+.result .meta{font-size:12px;color:#9da6b4;margin-top:6px}
+.footer{text-align:center;color:#737e8e;font-size:11px;line-height:1.6;margin-top:18px}
+.connection{display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;color:#a0a8b5;margin-top:14px}
+.dot{width:8px;height:8px;border-radius:50%;background:#c18b35}
+.dot.online{background:#39b66a}
+@media(max-width:400px){.panel{padding:17px}.status{font-size:28px}button{font-size:15px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+  <h1>HTM Annual Dinner 2026</h1>
+  <div class="subtitle">Host Control Panel</div>
+</header>
+<section class="panel">
+  <div class="label">Lucky Draw Status</div>
+  <div class="status" id="statusText">CONNECTING...</div>
+
+  <button id="startButton" class="start" type="button">🎁 START LUCKY DRAW</button>
+  <button id="stopButton" class="stop" type="button">■ STOP AWARD MUSIC</button>
+  <button id="refreshButton" class="refresh" type="button">↻ REFRESH STATUS</button>
+
+  <div class="message" id="message" role="status">Connecting to the event system...</div>
+
+  <div class="result">
+    <div class="small">LAST WINNER</div>
+    <div class="number" id="lastNumber">—</div>
+    <div class="name" id="lastName">No winner result yet</div>
+    <div class="meta" id="lastMeta"></div>
+  </div>
+  <div class="connection"><span class="dot" id="connectionDot"></span><span id="connectionText">Checking connection...</span></div>
+</section>
+<div class="footer">
+  Keep this page open on the iPad.<br>
+  The PC/laptop must have the Lucky Draw Display page open and connected to the projector.
+</div>
+</main>
+<script>
+var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
+
+function jsonp(params){
+  return new Promise(function(resolve,reject){
+    var callback="htmControllerCb_"+Date.now()+"_"+Math.floor(Math.random()*100000);
+    var script=document.createElement("script");
+    var timer=setTimeout(function(){cleanup();reject(new Error("Request timed out. Check the internet connection."));},15000);
+    function cleanup(){clearTimeout(timer);script.remove();try{delete window[callback];}catch(e){window[callback]=undefined;}}
+    window[callback]=function(response){cleanup();resolve(response);};
+    params.callback=callback;
+    script.onerror=function(){cleanup();reject(new Error("Could not connect to Google Apps Script."));};
+    script.src=GOOGLE_SCRIPT_URL+"?"+Object.keys(params).map(function(k){return encodeURIComponent(k)+"="+encodeURIComponent(params[k]);}).join("&");
+    document.body.appendChild(script);
+  });
+}
+function api(action,extra){var p=extra||{};p.action=action;return jsonp(p);}
+function setMessage(text){document.getElementById("message").textContent=text;}
+function setConnection(ok,text){
+  document.getElementById("connectionDot").className=ok?"dot online":"dot";
+  document.getElementById("connectionText").textContent=text;
+}
+function renderStatus(payload){
+  var status=payload.status||"ready";
+  var labels={ready:"READY",queued:"REQUEST SENT",drawing:"DRAWING...",complete:"DRAW COMPLETE",empty:"FINISHED",error:"ERROR"};
+  document.getElementById("statusText").textContent=labels[status]||status.toUpperCase();
+  if(payload.message)setMessage(payload.message);
+  if(payload.lastResult){
+    var r=payload.lastResult;
+    if(r.number)document.getElementById("lastNumber").textContent=r.number;
+    if(r.name)document.getElementById("lastName").textContent=r.name;
+    var meta=[];
+    if(r.guestId)meta.push("Guest ID: "+r.guestId);
+    if(r.remaining!=="")meta.push("Remaining: "+r.remaining);
+    document.getElementById("lastMeta").textContent=meta.join(" • ");
+  }
+}
+async function refreshStatus(showError){
+  try{
+    var response=await api("remoteStatus");
+    if(String(response).indexOf("REMOTE_STATUS|")!==0)throw new Error(String(response));
+    var payload=JSON.parse(String(response).slice(14));
+    renderStatus(payload);
+    setConnection(true,"Connected to event system");
+  }catch(err){
+    setConnection(false,"Connection problem");
+    if(showError)setMessage(err.message);
+  }
+}
+var startBusy=false;
+document.getElementById("startButton").addEventListener("click",async function(){
+  if(startBusy)return;
+  startBusy=true;
+  var button=this;button.disabled=true;
+  setMessage("Sending the start command to the big-screen PC...");
+  try{
+    var response=await api("remoteStart");
+    if(String(response)==="REMOTE_BUSY"){
+      setMessage("A lucky draw is already in progress. Please wait.");
+    }else if(String(response).indexOf("REMOTE_QUEUED|")===0){
+      document.getElementById("statusText").textContent="REQUEST SENT";
+      setMessage("Start command sent. The big-screen PC will begin the draw shortly.");
+    }else{
+      throw new Error(String(response));
+    }
+  }catch(err){setMessage("Could not start: "+err.message);}
+  finally{startBusy=false;button.disabled=false;refreshStatus(false);}
+});
+document.getElementById("stopButton").addEventListener("click",async function(){
+  this.disabled=true;
+  try{
+    var response=await api("remoteStop");
+    if(String(response)==="REMOTE_STOP_QUEUED"){
+      setMessage("Stop command sent. The award music on the PC will stop shortly.");
+    }else throw new Error(String(response));
+  }catch(err){setMessage("Could not send stop command: "+err.message);}
+  finally{this.disabled=false;}
+});
+document.getElementById("refreshButton").addEventListener("click",function(){refreshStatus(true);});
+refreshStatus(true);
+setInterval(function(){refreshStatus(false);},3000);
+</script>
+</body>
+</html>
