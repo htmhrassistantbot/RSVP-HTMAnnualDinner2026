@@ -429,18 +429,26 @@
     }
  function setCameraDisplayDirection() {
   var video = document.querySelector("#reader video");
-  if (!video || !video.srcObject) return;
-  var tracks = video.srcObject.getVideoTracks();
-  if (tracks.length > 0) {
-    var settings = tracks[0].getSettings();
-    if (settings.facingMode === "user") {
-      // Front camera: Mirror view
-      video.classList.add("front-camera");
-    } else {
-      // Back camera: Normal view
-      video.classList.remove("front-camera");
-    }
+  if (!video || !video.srcObject) {
+    console.log("Camera video not found");
+    return;
   }
+  var track = video.srcObject.getVideoTracks()[0];
+  if (!track) {
+    console.log("Camera track not found");
+    return;
+  }
+  var settings = track.getSettings();
+  console.log("Camera settings:", settings);
+  console.log("Camera facing mode:", settings.facingMode);
+  if (settings.facingMode === "user") {
+    video.style.transform = "scaleX(-1)";
+    console.log("Front camera mirror applied");
+  } else {
+    video.style.transform = "none";
+    console.log("Back camera normal view");
+  }
+}
     function initScanner() {
   html5QrcodeScanner = new Html5QrcodeScanner("reader", {
     fps: 15,
