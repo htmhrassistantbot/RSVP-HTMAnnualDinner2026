@@ -427,24 +427,21 @@
       };     
       document.body.appendChild(script);
     }
-    function setCameraDisplayDirection() {
+ function setCameraDisplayDirection() {
   var video = document.querySelector("#reader video");
-  if (!video) return;
-  // Detect the active camera
-  var stream = video.srcObject;
-  if (stream) {
-    var track = stream.getVideoTracks()[0];
-    if (track) {
-      var settings = track.getSettings();
-      if (settings.facingMode === "user") {
-        // Front camera: mirror display
-        video.classList.add("front-camera");
-      } else {
-        // Back camera: normal display
-        video.classList.remove("front-camera");
-      }
+  if (!video || !video.srcObject) return;
+  var tracks = video.srcObject.getVideoTracks();
+  if (tracks.length > 0) {
+    var settings = tracks[0].getSettings();
+    if (settings.facingMode === "user") {
+      // Front camera: Mirror view
+      video.classList.add("front-camera");
+    } else {
+      // Back camera: Normal view
+      video.classList.remove("front-camera");
     }
   }
+}
 }
     function initScanner() {
   html5QrcodeScanner = new Html5QrcodeScanner("reader", {
