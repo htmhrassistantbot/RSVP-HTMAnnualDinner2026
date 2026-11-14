@@ -442,7 +442,7 @@
   console.log("Camera settings:", settings);
   console.log("Camera facing mode:", settings.facingMode);
   if (settings.facingMode === "user") {
-    video.style.transform = "scaleX(-1)";
+    video.style.transform = "scaleX(1)";
     console.log("Front camera mirror applied");
   } else {
     video.style.transform = "none";
