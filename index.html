@@ -89,11 +89,6 @@
   transform: none !important;
   -webkit-transform: none !important;
 }
-/* Mirror effect only when using front camera */
-#reader video.front-camera {
-  transform: scaleX(1) !important;
-  -webkit-transform: scaleX(1) !important;
-}
     #reader border {
       border: none !important;
     }
@@ -427,26 +422,21 @@
       };     
       document.body.appendChild(script);
     }
- function setCameraDisplayDirection() {
+function setCameraDisplayDirection() {
   var video = document.querySelector("#reader video");
-  if (!video || !video.srcObject) {
-    console.log("Camera video not found");
-    return;
-  }
+  if (!video || !video.srcObject) return;
   var track = video.srcObject.getVideoTracks()[0];
-  if (!track) {
-    console.log("Camera track not found");
-    return;
-  }
+  if (!track) return;
   var settings = track.getSettings();
-  console.log("Camera settings:", settings);
-  console.log("Camera facing mode:", settings.facingMode);
+  console.log("Facing mode:", settings.facingMode);
   if (settings.facingMode === "user") {
-    video.style.transform = "scaleX(1)";
-    console.log("Front camera mirror applied");
+    video.style.setProperty("transform", "scaleX(1)", "important");
+    video.style.setProperty("-webkit-transform", "scaleX(1)", "important");
+    console.log("Front camera: Normal view");
   } else {
-    video.style.transform = "none";
-    console.log("Back camera normal view");
+    video.style.setProperty("transform", "scaleX(1)", "important");
+    video.style.setProperty("-webkit-transform", "scaleX(1)", "important");
+    console.log("Back camera: Normal view");
   }
 }
     function initScanner() {
