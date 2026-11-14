@@ -74,7 +74,74 @@ tbody tr:last-child td{border-bottom:0}
     <div class="note">Controlled remotely by the host iPad. Each lucky draw number can win only once.</div>
   </section>
 </main>
-<script>
+<script>  
+(async function() {
+  // SINGLE DISPLAY PROTECTION
+  if (!navigator.locks) {
+    document.body.innerHTML = `
+      <div style="background:#0d0f12;color:#f3e5ab;
+        min-height:100vh;display:flex;align-items:center;
+        justify-content:center;text-align:center;
+        font-family:Arial;padding:30px;">
+        <div>
+          <h1>DISPLAY PROTECTION UNAVAILABLE</h1>
+          <p>Please use the latest Google Chrome browser.</p>
+        </div>
+      </div>`;
+    return;
+  }
+  var lockResolved;
+  var displayLock = new Promise(function(resolve) {
+    lockResolved = resolve;
+  });
+  navigator.locks.request(
+    "HTM_ANNUAL_DINNER_2026_LUCKY_DRAW_DISPLAY",
+    { mode: "exclusive" },
+    async function(lock) {
+      lockResolved(true);
+      // Keep the display lock until this page is closed.
+      await new Promise(function(resolve) {
+        window.addEventListener("pagehide", resolve, { once: true });
+      });
+    }
+  ).catch(function(error) {
+    console.log("Display lock error:", error);
+    lockResolved(false);
+  });
+
+  // Give the first window time to acquire the lock.
+  var isMainDisplay = await Promise.race([
+    displayLock,
+    new Promise(function(resolve) {
+      setTimeout(function() {
+        resolve(false);
+      }, 500);
+    })
+  ]);
+  var waitingMessage = null;
+  if (!isMainDisplay) {
+    waitingMessage = document.createElement("div");
+    waitingMessage.style.cssText =
+      "position:fixed;inset:0;z-index:999999;" +
+      "background:#0d0f12;color:#f3e5ab;" +
+      "display:flex;align-items:center;justify-content:center;" +
+      "text-align:center;font-family:Arial;padding:30px;";
+    waitingMessage.innerHTML =
+      "<div>" +
+      "<h1>LUCKY DRAW DISPLAY ALREADY OPEN</h1>" +
+      "<p>Another window is currently running the lucky draw.</p>" +
+      "<p>Please use the existing display window.</p>" +
+      "<p>This window will activate automatically when the " +
+      "other display is closed.</p>" +
+      "</div>";
+    document.body.appendChild(waitingMessage);
+    isMainDisplay = await displayLock;
+    if (waitingMessage) {
+      waitingMessage.remove();
+    }
+  }
+  if (!isMainDisplay) return;
+  // EXISTING LUCKY DRAW CODE STARTS BELOW
 var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
 var wallpaperList=["bg1.jpeg","bg2.jpeg","bg3.jpeg","bg4.jpeg"];
 var currentBgIndex=0,activeSlide=1;
@@ -457,9 +524,10 @@ window.addEventListener("load", function() {
   initSlideshow();
   loadHistory();
   startRemotePolling();
-// Automatically attempt to play background music.
+  // Automatically attempt to play background music.
   startBackgroundMusic();
 });
+})(); // END SINGLE DISPLAY PROTECTION
 </script>
 </body>
 </html>
