@@ -521,13 +521,25 @@ function startRemotePolling(){
   setInterval(pollCommands,1000);
   setInterval(loadHistory,20000);
 }
-window.addEventListener("load", function() {
+function startLuckyDrawDisplay() {
+  console.log("HTM LUCKY DRAW DISPLAY STARTED");
   initSlideshow();
   loadHistory();
   startRemotePolling();
   // Automatically attempt to play background music.
   startBackgroundMusic();
-});
+}
+// Start immediately if the page has already loaded.
+// Otherwise, wait until the page is ready.
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    startLuckyDrawDisplay,
+    { once: true }
+  );
+} else {
+  startLuckyDrawDisplay();
+}
 })(); // END SINGLE DISPLAY PROTECTION
 </script>
 </body>
