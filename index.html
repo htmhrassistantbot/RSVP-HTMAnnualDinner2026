@@ -12,7 +12,6 @@
       --dark-bg: #0d0f12;
       --panel-bg: rgba(22, 26, 33, 0.95);
     }
-
     body { 
       font-family: 'Georgia', 'Times New Roman', serif; 
       text-align: center; 
@@ -24,7 +23,6 @@
       overflow-x: hidden;
       background-color: var(--dark-bg);
     }
-
     /* 🌟 ROTATING BACKGROUND SLIDESHOW CONTAINERS 🌟 */
     .bg-slide {
       position: fixed;
@@ -39,11 +37,9 @@
       opacity: 0;
       transition: opacity 1.5s ease-in-out;
     }
-
     .bg-slide.active {
       opacity: 1;
     }
-
     .bg-overlay {
       position: fixed;
       top: 0;
@@ -54,7 +50,6 @@
       background: linear-gradient(rgba(13, 15, 18, 0.82), rgba(13, 15, 18, 0.82));
       pointer-events: none;
     }
-
     h2 { 
       color: var(--gold-light); 
       margin-top: 10px;
@@ -65,7 +60,6 @@
       font-weight: 300;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
     }
-
     .subtitle {
       font-family: 'Segoe UI', sans-serif;
       font-size: 11px;
@@ -74,7 +68,6 @@
       letter-spacing: 3px;
       margin-bottom: 25px;
     }
-
     .scanner-container {
       position: relative;
       width: 100%;
@@ -85,30 +78,25 @@
       background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
-
     #reader { 
       width: 100% !important; 
       background: #000000 !important;
       border-radius: 4px;
       overflow: hidden;
     }
-    
    /* Camera display: normal direction by default */
 #reader video {
   transform: none !important;
   -webkit-transform: none !important;
 }
-
 /* Mirror effect only when using front camera */
 #reader video.front-camera {
   transform: scaleX(-1) !important;
   -webkit-transform: scaleX(-1) !important;
 }
-
     #reader border {
       border: none !important;
     }
-
     #reader a, #reader button {
       font-family: 'Segoe UI', sans-serif;
       color: #000000 !important;
@@ -124,7 +112,6 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       margin: 10px 0 !important;
     }
-
     .laser-line {
       position: absolute;
       left: 6px;
@@ -137,14 +124,12 @@
       pointer-events: none;
       animation: goldShimmer 3.5s ease-in-out infinite;
     }
-
     @keyframes goldShimmer {
       0% { top: 6px; opacity: 0; }
       10% { opacity: 1; }
       90% { opacity: 1; }
       100% { top: calc(100% - 10px); opacity: 0; }
     }
-
     #result { 
       margin: 30px auto 0 auto; 
       max-width: 340px; 
@@ -155,16 +140,13 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
       display: none; 
     }
-
     .animate-entrance {
       animation: formalEntrance 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
     }
-
     @keyframes formalEntrance {
       0% { transform: translateY(30px) scale(0.96); opacity: 0; }
       100% { transform: translateY(0) scale(1); opacity: 1; }
     }
-
     .success-header {
       color: var(--gold-light);
       font-size: 16px;
@@ -173,20 +155,17 @@
       letter-spacing: 4px;
       margin-bottom: 25px;
     }
-
     .gold-divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
       margin: 15px 0;
     }
-
     .data-row {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-bottom: 16px;
     }
-    
     .data-label {
       font-family: 'Segoe UI', sans-serif;
       color: #718096;
@@ -195,12 +174,10 @@
       letter-spacing: 2px;
       margin-bottom: 4px;
     }
-
     .data-value {
       font-size: 18px;
       color: #ffffff;
     }
-
     .table-badge {
       margin-top: 20px;
       padding: 14px;
@@ -208,7 +185,6 @@
       border-radius: 8px;
       background: rgba(212, 175, 55, 0.08);
     }
-
     .table-title {
       font-family: 'Segoe UI', sans-serif;
       font-size: 10px;
@@ -217,14 +193,12 @@
       letter-spacing: 2px;
       margin-bottom: 4px;
     }
-
     .table-number {
       font-size: 26px;
       font-weight: bold;
       color: var(--gold-light);
       letter-spacing: 1.5px;
     }
-
     .lucky-badge {
       margin-top: 15px;
       padding: 12px;
@@ -232,14 +206,12 @@
       border-radius: 8px;
       background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(13, 15, 18, 0.6));
     }
-
     .lucky-number {
       font-size: 22px;
       font-weight: bold;
       color: var(--gold-light);
       letter-spacing: 2px;
     }
-
     .hud-text {
       font-family: 'Segoe UI', sans-serif;
       font-size: 10px;
@@ -252,34 +224,26 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
-
   <!-- 🎵 BACKGROUND MUSIC AUDIO ELEMENT (Linked to local GitHub MP3) -->
   <audio id="bgMusic" loop>
     <source src="Hotel Music.mp3" type="audio/mpeg">
   </audio>
-
   <!-- 🌟 BACKGROUND SLIDESHOW LAYERS 🌟 -->
   <div id="slide1" class="bg-slide active"></div>
   <div id="slide2" class="bg-slide"></div>
   <div class="bg-overlay"></div>
-
   <h2>HTM Annual Dinner 2026</h2>
-  <div class="subtitle">Guest Welcoming Portal</div>
-  
+  <div class="subtitle">Guest Welcoming Portal</div> 
   <div class="scanner-container">
     <div class="laser-line"></div>
     <div id="reader"></div>
   </div>
-
   <div class="hud-text">Digital Concierge Active</div>
-
   <!-- Music Toggle Button -->
   <div>
     <button onclick="toggleMusic()" style="margin: 10px auto; padding: 6px 14px; font-size: 9px; font-family: 'Segoe UI', sans-serif; background: rgba(212,175,55,0.15); border: 1px solid var(--gold-primary); color: var(--gold-light); border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">🎵 Toggle Music</button>
   </div>
-
   <div id="result"></div>
-
   <script>
     // 📸 SLIDESHOW CONFIGURATION - Local GitHub Images
     var wallpaperList = [
@@ -290,67 +254,51 @@
     ];
     var currentBgIndex = 0;
     var activeSlide = 1;
-
     function rotateWallpapers() {
       if (wallpaperList.length <= 1) return;
-
       var nextIndex = (currentBgIndex + 1) % wallpaperList.length;
       var currentSlideEl = document.getElementById(activeSlide === 1 ? 'slide1' : 'slide2');
       var nextSlideEl = document.getElementById(activeSlide === 1 ? 'slide2' : 'slide1');
-
       nextSlideEl.style.backgroundImage = "url('" + wallpaperList[nextIndex] + "')";
       nextSlideEl.classList.add('active');
       currentSlideEl.classList.remove('active');
-
       activeSlide = activeSlide === 1 ? 2 : 1;
       currentBgIndex = nextIndex;
     }
-
     function initSlideshow() {
       if (wallpaperList.length > 0) {
         document.getElementById('slide1').style.backgroundImage = "url('" + wallpaperList[0] + "')";
         setInterval(rotateWallpapers, 6000);
       }
     }
-
     var html5QrcodeScanner;
-    var isProcessing = false;
-    
+    var isProcessing = false;  
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
-
     // 🔊 AUDIO / SPEECH ENGINE SETUP
     var availableVoices = [];
-
     function populateVoiceList() {
       if ('speechSynthesis' in window) {
         availableVoices = window.speechSynthesis.getVoices();
       }
     }
-
     if ('speechSynthesis' in window) {
       populateVoiceList();
       if (speechSynthesis.onvoiceschanged !== undefined) {
         speechSynthesis.onvoiceschanged = populateVoiceList;
       }
     }
-
     function speakPersonalizedWelcome(name, table) {
       try {
         if (!('speechSynthesis' in window)) return;
-
         // Clear active speech queue safely
         if (window.speechSynthesis.speaking) {
           window.speechSynthesis.cancel();
         }
-
         var customSpeechText = "Welcome. Your table assignment is " + table + ". Please enjoy the Annual Dinner.";
-        
         var utterance = new SpeechSynthesisUtterance(customSpeechText);
-
         if (availableVoices.length === 0) {
           availableVoices = window.speechSynthesis.getVoices();
         }
-        
         var selectedVoice = availableVoices.find(function(v) {
           return v.name.includes('Premium') || 
                  v.name.includes('Natural') || 
@@ -360,24 +308,19 @@
         }) || availableVoices.find(function(v) {
           return v.lang && (v.lang.startsWith('en') || v.lang.startsWith('en-US'));
         });
-
         if (selectedVoice) {
           utterance.voice = selectedVoice;
         }
-
         utterance.rate = 0.95;
         utterance.pitch = 1.0; 
-
         // 🎯 Buffer delay prevents camera shutdown from interrupting speech
         setTimeout(function() {
           window.speechSynthesis.speak(utterance);
         }, 300);
-
       } catch (e) {
         console.error("Personalized audio processing bypass:", e);
       }
     }
-
     function unlockAudioEngine() {
       // 🎵 Start background music on user interaction
       var music = document.getElementById('bgMusic');
@@ -387,7 +330,6 @@
           console.log("Audio autoplay restricted:", e);
         });
       }
-
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         var dummyUtterance = new SpeechSynthesisUtterance("");
@@ -395,7 +337,6 @@
         window.speechSynthesis.speak(dummyUtterance);
       }
     }
-
     function toggleMusic() {
       var music = document.getElementById('bgMusic');
       if (music.paused) {
@@ -404,11 +345,9 @@
         music.pause();
       }
     }
-
     function parseQrPayload(text) {
       var extractedId = text;
       var extractedTable = null;
-
       if (text.includes("|")) {
         var segments = text.split("|");
         segments.forEach(function(segment) {
@@ -424,41 +363,33 @@
         var parts = text.split(":");
         extractedId = parts[parts.length - 1].trim();
       }
-
       return {
         id: extractedId,
         table: extractedTable
       };
     }
-
     function onScanSuccess(decodedText, decodedResult) {
       if (isProcessing) return;
-      isProcessing = true;
-      
+      isProcessing = true; 
       var resultDiv = document.getElementById('result');
       resultDiv.classList.remove('animate-entrance');
       resultDiv.style.display = 'block';
-      resultDiv.innerHTML = '<div class="success-header" style="color:#a0aec0; letter-spacing:2px;">Verifying Invitation...</div>';
-      
+      resultDiv.innerHTML = '<div class="success-header" style="color:#a0aec0; letter-spacing:2px;">Verifying Invitation...</div>'; 
       var rawText = decodedText.trim();
       var parsedData = parseQrPayload(rawText);
       var staffId = parsedData.id;
-      var qrTable = parsedData.table;
-      
+      var qrTable = parsedData.table;      
       var scriptId = 'google_jsonp_bridge';
       var oldScript = document.getElementById(scriptId);
-      if (oldScript) oldScript.parentNode.removeChild(oldScript);
-      
+      if (oldScript) oldScript.parentNode.removeChild(oldScript);      
       window.handleGoogleResponse = function(responseString) {
         html5QrcodeScanner.clear().then(function() {
-          var parts = responseString.split("|");
-          
+          var parts = responseString.split("|");          
           if (parts[0] === "SUCCESS") {
             var displayName = parts[1];    
             var calculatedTable = qrTable || parts[2] || "UNASSIGNED"; 
             var displayOutlet = parts[3] || "-";    
-            var luckyDrawNo = parts[4] || "-";
-            
+            var luckyDrawNo = parts[4] || "-";          
             resultDiv.classList.add('animate-entrance');
             resultDiv.innerHTML = 
               '<div class="success-header">✨ Welcome ✨</div>' +
@@ -475,9 +406,7 @@
                 '<div class="table-title">Lucky Draw No.</div>' +
                 '<div class="lucky-number">🎟️ ' + luckyDrawNo + '</div>' +
               '</div>';
-
             speakPersonalizedWelcome(displayName, calculatedTable);
-
             resetScanner(7000); 
           } else {
             resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
@@ -488,33 +417,25 @@
           isProcessing = false;
         });
       };
-
       var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
       var script = document.createElement('script');
       script.id = scriptId;
-      script.src = jsonpUrl;
-      
+      script.src = jsonpUrl;    
       script.onerror = function() {
         resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Connection Timeout</h3><p style='font-size:13px;'>Could not reach the database script.</p>";
         resetScanner(4000);
-      };
-      
+      };     
       document.body.appendChild(script);
     }
     function setCameraDisplayDirection() {
   var video = document.querySelector("#reader video");
-
   if (!video) return;
-
   // Detect the active camera
   var stream = video.srcObject;
-
   if (stream) {
     var track = stream.getVideoTracks()[0];
-
     if (track) {
       var settings = track.getSettings();
-
       if (settings.facingMode === "user") {
         // Front camera: mirror display
         video.classList.add("front-camera");
@@ -532,23 +453,19 @@
     rememberLastUsedCamera: true,
     aspectRatio: 1.0
   }, false);
-
   html5QrcodeScanner.render(
     onScanSuccess,
     function(error) {}
   );
-
   // Check camera direction after camera starts
   var cameraCheck = setInterval(function() {
     var video = document.querySelector("#reader video");
-
     if (video && video.srcObject) {
       setCameraDisplayDirection();
       clearInterval(cameraCheck);
     }
   }, 300);
 }
-
     function resetScanner(delay) {
       setTimeout(function() {
         isProcessing = false;
@@ -558,12 +475,10 @@
         initScanner();
       }, delay);
     }
-
     window.onload = function() {
       initSlideshow(); 
       initScanner();
-      populateVoiceList();
-      
+      populateVoiceList(); 
       document.body.addEventListener('click', unlockAudioEngine, { once: true });
       document.body.addEventListener('touchstart', unlockAudioEngine, { once: true });
     };
