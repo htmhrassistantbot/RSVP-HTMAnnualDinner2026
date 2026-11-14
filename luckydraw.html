@@ -48,7 +48,9 @@ tbody tr:last-child td{border-bottom:0}
   <h1>HTM Annual Dinner 2026</h1>
   <div class="subtitle">Lucky Draw Celebration</div>
   <section class="panel">
-    <button id="audioStartButton" class="audio-start" type="button">🔊 ENABLE DISPLAY SOUND</button>
+    <button id="audioStartButton" class="audio-start" type="button">
+  🔇 MUTE BACKGROUND SOUND
+  </button>
     <div class="eyebrow">And the lucky winner is...</div>
     <div class="winner-box" aria-live="polite">
       <div id="winnerNumber">READY</div>
@@ -74,7 +76,6 @@ tbody tr:last-child td{border-bottom:0}
 </main>
 <script>
 var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzyOEtXFeEhNcqat7VzlpLR71eJ-XKSsTXgDzRZ9Z85RZXWt-sujmopjBCYq83CheMoEQ/exec";
-
 var wallpaperList=["bg1.jpeg","bg2.jpeg","bg3.jpeg","bg4.jpeg"];
 var currentBgIndex=0,activeSlide=1;
 function rotateWallpapers(){
@@ -92,26 +93,83 @@ function initSlideshow(){
     setInterval(rotateWallpapers,6000);
   }
 }
-
-var backgroundAudio=new Audio("https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Intro.mp3");
-backgroundAudio.loop=true;backgroundAudio.volume=.25;
-var drumRollAudio=new Audio("https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/DrumRoll.mp3");
-drumRollAudio.loop=false;drumRollAudio.preload="auto";drumRollAudio.volume=.85;
-var awardAudio=new Audio("https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Awards.mp3");
-awardAudio.loop=false;awardAudio.volume=.85;
-var soundEnabled=false,backgroundMusicEnabled=false;
-
-document.getElementById("audioStartButton").addEventListener("click",async function(){
-  soundEnabled=true;
-  this.textContent="✓ DISPLAY SOUND ENABLED";
-  try{
-    await backgroundAudio.play();
-    backgroundMusicEnabled=true;
-  }catch(e){
-    document.getElementById("message").textContent="Sound enabled. Background music could not start; check Intro.mp3.";
+var backgroundAudio = new Audio(
+  "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Intro.mp3"
+);
+backgroundAudio.loop = true;
+backgroundAudio.volume = 0.25;
+backgroundAudio.preload = "auto";
+var drumRollAudio = new Audio(
+  "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/DrumRoll.mp3"
+);
+drumRollAudio.loop = false;
+drumRollAudio.preload = "auto";
+drumRollAudio.volume = 0.85;
+var awardAudio = new Audio(
+  "https://htmhrassistantbot.github.io/RSVP-HTMAnnualDinner2026/Awards.mp3"
+);
+awardAudio.loop = false;
+awardAudio.volume = 0.85;
+var soundEnabled = false;
+var backgroundMusicEnabled = false;
+var backgroundMuted = false;
+function updateBackgroundButton() {
+  var button = document.getElementById("audioStartButton");
+  if (backgroundAudio.paused) {
+    button.textContent = "🔊 ENABLE BACKGROUND SOUND";
+  } else if (backgroundMuted) {
+    button.textContent = "🔊 UNMUTE BACKGROUND SOUND";
+  } else {
+    button.textContent = "🔇 MUTE BACKGROUND SOUND";
   }
-});
-
+}
+// Attempt to start background music automatically.
+async function startBackgroundMusic() {
+  try {
+    soundEnabled = true;
+    await backgroundAudio.play();
+    backgroundMusicEnabled = true;
+    backgroundAudio.volume = backgroundMuted ? 0 : 0.25;
+    updateBackgroundButton();
+  } catch (error) {
+    console.log("Autoplay blocked by browser:", error);
+    document.getElementById("message").textContent =
+      "Please click ENABLE BACKGROUND SOUND to start the music.";
+    updateBackgroundButton();
+  }
+}
+// Mute / unmute button.
+document.getElementById("audioStartButton").addEventListener(
+  "click",
+  async function() {
+    soundEnabled = true;
+    if (backgroundAudio.paused) {
+      backgroundMuted = false;
+      try {
+        await backgroundAudio.play();
+        backgroundMusicEnabled = true;
+        backgroundAudio.volume = 0.25;
+        document.getElementById("message").textContent =
+          "Background music enabled.";
+      } catch (error) {
+        console.log("Background music error:", error);
+        document.getElementById("message").textContent =
+          "Unable to play Intro.mp3. Please check the audio file.";
+      }
+    } else if (backgroundMuted) {
+      backgroundMuted = false;
+      backgroundAudio.volume = 0.25;
+      document.getElementById("message").textContent =
+        "Background music unmuted.";
+    } else {
+      backgroundMuted = true;
+      backgroundAudio.volume = 0;
+      document.getElementById("message").textContent =
+        "Background music muted.";
+    }
+    updateBackgroundButton();
+  }
+);
 function jsonp(params){
   return new Promise(function(resolve,reject){
     var callback="htmRemoteCb_"+Date.now()+"_"+Math.floor(Math.random()*100000);
@@ -144,42 +202,25 @@ async function loadHistory(){
     }).join("");
   }catch(err){document.getElementById("message").textContent="Could not refresh winner history: "+err.message;}
 }
-
 function pauseBackgroundMusic(){
-
   if(backgroundAudio){
     // Keep music playing, but mute it during the lucky draw
     backgroundAudio.volume = 0;
   }
-
 }
-
-
-async function playBackgroundMusic(){
-
-  if(soundEnabled && backgroundAudio){
-
-    // Restore background music volume
-    backgroundAudio.volume = 0.25;
-
-    // Only attempt playback if it is not already playing
-    if(backgroundAudio.paused){
-
-      try{
-        await backgroundAudio.play();
-        backgroundMusicEnabled = true;
-      }catch(e){
-        console.log("Background music playback error:", e);
-      }
-
-    }else{
-      backgroundMusicEnabled = true;
+async function playBackgroundMusic() {
+  if (!soundEnabled || !backgroundAudio) return;
+  try {
+    if (backgroundAudio.paused) {
+      await backgroundAudio.play();
     }
-
+    backgroundAudio.volume = backgroundMuted ? 0 : 0.25;
+    backgroundMusicEnabled = true;
+    updateBackgroundButton();
+  } catch (error) {
+    console.log("Background music playback error:", error);
   }
-
 }
-
 function stopDrumRoll(){drumRollAudio.pause();drumRollAudio.currentTime=0;}
 function stopAwardMusic(){awardAudio.pause();awardAudio.currentTime=0;}
 function reportResult(status,result){
@@ -226,65 +267,43 @@ async function getDrumRollDuration(){
     ready();
   });
 }
-
-
-
 async function playDrumRollAndAnimate(numberEl) {
-
   drumRollAudio.pause();
   drumRollAudio.currentTime = 0;
-
   var finished = false;
   var animationFrame = null;
   var lastChange = 0;
-
   numberEl.classList.add("rolling");
-
   if (!soundEnabled) {
     numberEl.classList.remove("rolling");
     return;
   }
-
   return new Promise(function(resolve) {
-
     function finishRoll() {
-
       if (finished) return;
-
       finished = true;
-
       if (animationFrame !== null) {
         cancelAnimationFrame(animationFrame);
         animationFrame = null;
       }
-
       numberEl.classList.remove("rolling");
-
       drumRollAudio.removeEventListener("ended", finishRoll);
       drumRollAudio.removeEventListener("error", finishRoll);
-
       resolve();
     }
-
     function animate(timestamp) {
-
       if (finished) return;
-
       if (drumRollAudio.ended) {
         finishRoll();
         return;
       }
-
       var remaining =
         drumRollAudio.duration - drumRollAudio.currentTime;
-
       var interval;
-
       // Fast rolling during the first part
       if (remaining > 1) {
         interval = 60;
       }
-
       // Gradually slow down during the final second
       else if (remaining > 0.7) {
         interval = 120;
@@ -295,41 +314,29 @@ async function playDrumRollAndAnimate(numberEl) {
       else {
         interval = 300;
       }
-
       if (timestamp - lastChange >= interval) {
-
         numberEl.textContent =
           String(Math.floor(Math.random() * 900) + 100);
-
         lastChange = timestamp;
       }
-
       animationFrame = requestAnimationFrame(animate);
     }
-
     drumRollAudio.addEventListener(
       "ended",
       finishRoll,
       { once: true }
     );
-
     drumRollAudio.addEventListener(
       "error",
       finishRoll,
       { once: true }
     );
-
     drumRollAudio.play().then(function() {
-
       animationFrame = requestAnimationFrame(animate);
-
     }).catch(function(error) {
-
       console.log("Drum roll playback error:", error);
       finishRoll();
-
     });
-
   });
 } 
 async function runLuckyDraw() {
@@ -337,151 +344,121 @@ async function runLuckyDraw() {
   var nameEl = document.getElementById("winnerName");
   var metaEl = document.getElementById("winnerMeta");
   var messageEl = document.getElementById("message");
-
   pauseBackgroundMusic();
   stopAwardMusic();
-
   if ("speechSynthesis" in window) {
     window.speechSynthesis.cancel();
   }
-
   messageEl.textContent = "The host has started the lucky draw. Good luck!";
-
   numberEl.classList.add("rolling");
   nameEl.textContent = "Selecting the lucky number...";
   metaEl.textContent = "";
-
   try {
     // IMPORTANT: Request the winner immediately,
     // while the drum roll and animation are running.
     var drawRequest = api("draw");
-
     // Run animation and drum roll together.
     await playDrumRollAndAnimate(numberEl);
-
     // The winner should already be ready from Google Sheets.
     var response = await drawRequest;
-
     numberEl.classList.remove("rolling");
-
     var parts = String(response).split("|");
-
     if (parts[0] === "DRAWN") {
-
       var result = {
         number: parts[1] || "",
         name: parts[2] || "Winner",
         guestId: parts[3] || "-",
         remaining: parts[4] || "0"
       };
-
       numberEl.textContent = result.number;
-
       numberEl.classList.remove("reveal");
       void numberEl.offsetWidth;
       numberEl.classList.add("reveal");
-
       nameEl.textContent = result.name;
       metaEl.textContent = "Guest ID: " + result.guestId;
-
       document.getElementById("remainingCount").textContent =
         result.remaining;
-
       messageEl.textContent =
         "CONGRATULATIONS! Announcing the lucky number...";
-
       await loadHistory();
       await announceNumber(result.number);
-
       messageEl.textContent =
         "CONGRATULATIONS! We have a winner!";
-
       if (soundEnabled) {
         awardAudio.currentTime = 0;
         awardAudio.play().catch(function() {});
       }
-
       await reportResult("complete", result);
-
     } else if (parts[0] === "EMPTY") {
-
       numberEl.textContent = "FINISHED";
       nameEl.textContent = "All eligible numbers have been drawn.";
       metaEl.textContent = "";
-
       messageEl.textContent = "No eligible numbers remain.";
-
       document.getElementById("remainingCount").textContent = "0";
-
       await reportResult("empty", {
         message: "All eligible numbers have been drawn.",
         remaining: "0"
       });
-
     } else {
       throw new Error(
         parts.slice(1).join("|") || "Unknown server response."
       );
     }
-
   } catch (err) {
-
     stopDrumRoll();
-
     numberEl.classList.remove("rolling");
-
     messageEl.textContent = "Draw error: " + err.message;
     nameEl.textContent = "Please check the connection.";
-
     await reportResult("error", {
       message: err.message
     });
-
     await playBackgroundMusic();
   }
 }
-var pollBusy=false;
-var handledCommands={};
-async function pollCommands(){
-  if(pollBusy)return;
-  pollBusy=true;
-  try{
-    var response=await api("remotePoll");
-    if(String(response).indexOf("COMMAND|")===0){
-      var payload=JSON.parse(String(response).slice(8));
-      var command=payload.command;
-      if(command && !handledCommands[command.id]){
-        handledCommands[command.id]=true;
-        await api("remoteAck",{commandId:command.id});
-        if(command.type==="draw"){
+var pollBusy = false;
+var handledCommands = {};
+async function pollCommands() {
+  if (pollBusy) return;
+  pollBusy = true;
+  try {
+    var response = await api("remotePoll");
+    if (String(response).indexOf("COMMAND|") === 0) {
+      var payload = JSON.parse(String(response).slice(8));
+      var command = payload.command;
+      if (command && !handledCommands[command.id]) {
+        handledCommands[command.id] = true;
+        await api("remoteAck", {
+          commandId: command.id
+        });
+        if (command.type === "draw") {
           await runLuckyDraw();
-       }else if(command.type==="stopAward"){
-
-  // Stop the award celebration music
-  stopAwardMusic();
-
-  // Resume the background music
-  await playBackgroundMusic();
-
-  document.getElementById("message").textContent =
-    "Award music stopped. Background music resumed.";
-
-}
-
+        } else if (command.type === "stopAward") {
+          stopAwardMusic();
+          await playBackgroundMusic();
+          document.getElementById("message").textContent =
+            backgroundMuted
+              ? "Award music stopped. Background music remains muted."
+              : "Award music stopped. Background music resumed.";
+        }
       }
     }
-  }catch(err){console.log("Remote polling:",err.message);}
-  finally{pollBusy=false;}
+  } catch (err) {
+    console.log("Remote polling:", err.message);
+  } finally {
+    pollBusy = false;
+  }
 }
 function startRemotePolling(){
   pollCommands();
   setInterval(pollCommands,1000);
   setInterval(loadHistory,20000);
 }
-window.addEventListener("load",function(){
+window.addEventListener("load", function() {
   initSlideshow();
   loadHistory();
   startRemotePolling();
+// Automatically attempt to play background music.
+  startBackgroundMusic();
 });
 </script>
 </body>
